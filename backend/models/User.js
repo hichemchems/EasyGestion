@@ -29,6 +29,21 @@ const User = sequelize.define('User', {
     allowNull: false,
     defaultValue: 'user'
   },
+  siret: {
+    type: DataTypes.STRING(14),
+    allowNull: true,
+    validate: {
+      len: [14, 14]
+    }
+  },
+  phone: {
+    type: DataTypes.STRING(20),
+    allowNull: true
+  },
+  logo_path: {
+    type: DataTypes.STRING(255),
+    allowNull: true
+  },
   created_at: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW

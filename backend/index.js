@@ -78,6 +78,10 @@ const startServer = async () => {
     await sequelize.sync({ force: false }); // Set force: true to drop and recreate tables
     console.log('Database synchronized successfully.');
 
+    // Seed initial data
+    const seedPackages = require('./seeders/packages');
+    await seedPackages();
+
     // Start server
     server.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
