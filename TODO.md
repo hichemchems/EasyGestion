@@ -8,7 +8,7 @@
 - [ ] Define project architecture (backend API + React frontend)
 
 ### 2. Database Setup (MySQL)
-- [ ] Design database schema:
+- [x] Design database schema:
   - Users table (id, username, email, password_hash, role, created_at, updated_at)
   - Employees table (id, user_id, name, position, hire_date, deduction_percentage)
   - Packages table (id, name, price, is_active, created_at, updated_at) - predefined packages customizable by admin
@@ -16,10 +16,10 @@
   - Receipts table (id, employee_id, client_name, amount, date, description)
   - Expenses table (id, category, amount, date, description, created_by)
   - Salaries table (id, employee_id, base_salary, commission_percentage, total_salary, period_start, period_end)
-- [ ] Set up Sequelize models and associations
-- [ ] Create database migrations
-- [ ] Implement database connection and error handling
-- [ ] Seed initial packages: Barbe (7€), Coupe de cheveux (12€), Coupe de cheveux sans contour (16€), Coupe de cheveux avec contour (19€), Coupe de cheveux enfant (10€), and add 6th package as needed
+- [x] Set up Sequelize models and associations
+- [x] Create database migrations
+- [x] Implement database connection and error handling
+- [x] Seed initial packages: Barbe (7€), Coupe de cheveux (12€), Coupe de cheveux sans contour (16€), Coupe de cheveux avec contour (19€), Coupe de cheveux enfant (10€), and add 6th package as needed
 
 ## Phase 2: Backend Core (Essential Infrastructure)
 ### 3. Backend Setup (Node.js/Express)

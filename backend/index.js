@@ -8,6 +8,10 @@ const fileUpload = require('express-fileupload');
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 
+// Database setup
+const { sequelize, testConnection } = require('./config/database');
+const models = require('./models');
+
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
@@ -63,8 +67,27 @@ app.use('*', (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+
+// Initialize database and start server
+const startServer = async () => {
+  try {
+    // Test database connection
+    await testConnection();
+
+    // Sync database (create tables if they don't exist)
+    await sequelize.sync({ force: false }); // Set force: true to drop and recreate tables
+    console.log('Database synchronized successfully.');
+
+    // Start server
+    server.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+startServer();
 
 module.exports = { app, server, io };
