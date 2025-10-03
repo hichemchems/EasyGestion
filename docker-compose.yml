@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: easygestion
+      MYSQL_USER: easygestionuser
+      MYSQL_PASSWORD: easygestionpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  backend:
+    build: ./backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      DB_HOST: db
+      DB_USER: easygestionuser
+      DB_PASSWORD: easygestionpass
+      DB_NAME: easygestion
+      JWT_SECRET: your_super_secret_jwt_key_here
+      PORT: 5000
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:5000/api/v1
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
