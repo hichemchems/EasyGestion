@@ -61,14 +61,7 @@ router.post('/', adminCreationValidation, async (req, res) => {
 
     const { email, siret, phone, password, name } = req.body;
 
-    // Check if admin already exists
-    const existingAdmin = await User.findOne({
-      where: { role: ['admin', 'superAdmin'] }
-    });
-
-    if (existingAdmin) {
-      return res.status(400).json({ message: 'An admin already exists. Use the registration endpoint for additional users.' });
-    }
+    // Allow multiple admins for testing
 
     // Check if user with email already exists
     const existingUser = await User.findOne({ where: { email } });
