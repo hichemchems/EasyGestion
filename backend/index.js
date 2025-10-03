@@ -11,6 +11,7 @@ const { Server } = require('socket.io');
 // Database setup
 const { sequelize, testConnection } = require('./config/database');
 const models = require('./models');
+const scheduler = require('./scheduler');
 
 const app = express();
 const server = createServer(app);
@@ -75,7 +76,7 @@ const startServer = async () => {
     await testConnection();
 
     // Sync database (create tables if they don't exist)
-    await sequelize.sync({ force: false }); // Set force: true to drop and recreate tables
+    await sequelize.sync({ alter: true }); // Set force: true to drop and recreate tables
     console.log('Database synchronized successfully.');
 
     // Seed initial data
@@ -92,6 +93,9 @@ const startServer = async () => {
   }
 };
 
-startServer();
+// Only start server if this file is run directly
+if (require.main === module) {
+  startServer();
+}
 
 module.exports = { app, server, io };
