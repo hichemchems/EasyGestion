@@ -84,11 +84,23 @@ router.post('/generate', authenticateToken, authorizeRoles('admin', 'superAdmin'
       parseFloat(adminCharges.salaries)
     ) : 0;
 
+    // Calculate number of working days in the period (excluding Sundays)
+    const startDate = new Date(period_start);
+    const endDate = new Date(period_end);
+    let workingDays = 0;
+
+    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+      if (d.getDay() !== 0) { // 0 = Sunday
+        workingDays++;
+      }
+    }
+
     // Calculate base salary (turnover minus charges)
     const baseSalary = totalTurnover - totalCharges;
 
-    // Apply deduction percentage
-    const netSalary = baseSalary * (1 - employee.deduction_percentage / 100);
+    // Divide by working days to get daily salary, then apply deduction percentage
+    const dailySalary = baseSalary / workingDays;
+    const netSalary = dailySalary * (1 - employee.deduction_percentage / 100);
 
     // Create salary record
     const salary = await Salary.create({
@@ -110,7 +122,9 @@ router.post('/generate', authenticateToken, authorizeRoles('admin', 'superAdmin'
           total: totalTurnover
         },
         charges: totalCharges,
-        deduction_percentage: employee.deduction_percentage
+        deduction_percentage: employee.deduction_percentage,
+        working_days: workingDays,
+        daily_salary: dailySalary
       }
     });
   } catch (error) {

@@ -79,7 +79,7 @@
   - PUT /api/employees/:id/deduction-percentage (set/change deduction percentage for employee)
   - DELETE /api/users/:id
 
-### 7. Package and Sales API (Core Feature)
+### 7. Package and Sales API (Core Feature) [x]
 - [x] Package management endpoints (admin):
   - GET /api/packages (get all active packages)
   - POST /api/packages (create new package)
