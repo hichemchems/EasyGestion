@@ -124,6 +124,7 @@ router.post('/login', loginValidation, async (req, res) => {
 
     res.json({
       message: 'Login successful',
+      token,
       user: {
         id: user.id,
         username: user.username,

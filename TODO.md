@@ -1,3 +1,4 @@
+
 # TODO List for EasyGestion API Development (Prioritized by Importance and Logical Order)
 
 ## Phase 1: Foundation (Most Critical - Start Here) [x]
@@ -79,7 +80,7 @@
   - PUT /api/employees/:id/deduction-percentage (set/change deduction percentage for employee)
   - DELETE /api/users/:id
 
-### 7. Package and Sales API (Core Feature) [x]
+### 5. Package and Sales API (Core Feature) [x]
 - [x] Package management endpoints (admin):
   - GET /api/packages (get all active packages)
   - POST /api/packages (create new package)
@@ -90,21 +91,42 @@
   - POST /api/employees/:id/sales (create sale from package selection)
   - PUT /api/employees/:id/sales/:saleId
   - DELETE /api/employees/:id/sales/:saleId
+- [x] Implement scheduler for daily alerts and monthly carry-over of unmet goals
+- [x] Update salary calculation logic to consider working days excluding Sundays
+
+### 6. Receipt, Admin Charges, Expenses, Goals, Alerts, Analytics APIs [x]
+- [x] Implement receipt entry and validation APIs
+- [x] Implement admin charges management APIs
+- [x] Implement expense tracking and categorization APIs
+- [x] Implement goal management with carry-over logic
+- [x] Implement alert management for objectives
+- [x] Implement analytics endpoints for turnover, profit, evolution, and performance
+
+### 7. Salary Generation and Viewing [x]
+- [x] Implement salary generation and retrieval APIs
+- [x] Update salary calculation logic to consider working days excluding Sundays
+- [x] Implement scheduler for daily alerts and monthly carry-over of unmet goals
 
 ### 8. Business Logic Implementation
-- [ ] Implement package selection and sales creation (auto-generate price from selected package)
-- [ ] Implement receipt entry and validation
-- [ ] Create turnover calculation functions (daily/weekly/monthly/annual, including monthly evolution over time) - include sales in turnover
-- [ ] Implement expense tracking and categorization
-- [ ] Develop profit calculation (turnover - expenses)
-- [ ] Build automatic salary generation based on commission structure (include sales commissions)
-- [ ] Calculate remaining revenue (monthly receipts and sales minus percentage charges for each barber)
-- [ ] Implement admin charge data input form accessible from dashboard button "Personnaliser Charge"
-- [ ] Allow admin to input and customize charges: rent, charges, operating costs, electricity, salaries
-- [ ] Calculate turnover, profit, and forecast objectives considering admin charges
-- [ ] Implement daily alert at 9 AM with daily/monthly objectives and remaining amount to reach goals
-- [ ] Implement carry-over of unmet goals distributed equally among remaining days and barbers
-- [ ] Calculate salaries based on individual barber turnover minus charges, divided by days worked (salon closed Sundays)
+- [x] Implement package selection and sales creation (auto-generate price from selected package)
+- [x] Implement receipt entry and validation
+- [x] Create turnover calculation functions (daily/weekly/monthly/annual, including monthly evolution over time) - include sales in turnover
+- [x] Implement expense tracking and categorization
+- [x] Develop profit calculation (turnover - expenses)
+- [x] Build automatic salary generation based on commission structure (include sales commissions)
+- [x] Calculate remaining revenue (monthly receipts and sales minus percentage charges for each barber)
+- [x] Implement admin charge data input form accessible from dashboard button "Personnaliser Charge"
+- [x] Allow admin to input and customize charges: rent, charges, operating costs, electricity, salaries
+- [x] Calculate turnover, profit, and forecast objectives considering admin charges
+- [x] Implement daily alert at 9 AM with daily/monthly objectives and remaining amount to reach goals
+- [x] Implement carry-over of unmet goals distributed equally among remaining days and barbers
+- [x] Calculate salaries based on individual barber turnover minus charges, divided by days worked (salon closed Sundays)
+
+### 9. Frontend UI Components [x]
+- [x] Create color scheme (black/white/gray/yellow for logout, green for validation hover, red for errors)
+- [x] Implement receipt entry form component
+- [x] Implement admin charge form component
+- [x] Implement analytics dashboard component
 
 ## Phase 4: Advanced API Features
 ### 9. Analytics and Dashboard API

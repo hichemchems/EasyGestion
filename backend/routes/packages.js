@@ -52,15 +52,15 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
-    const package = await Package.findByPk(id);
+    const pkg = await Package.findByPk(id);
 
-    if (!package) {
+    if (!pkg) {
       return res.status(404).json({ message: 'Package not found' });
     }
 
     res.json({
       message: 'Package retrieved successfully',
-      package
+      package: pkg
     });
   } catch (error) {
     console.error('Get package error:', error);
@@ -78,7 +78,7 @@ router.post('/', authenticateToken, authorizeRoles('admin', 'superAdmin'), packa
 
     const { name, price, is_active = true } = req.body;
 
-    const package = await Package.create({
+    const pkg = await Package.create({
       name,
       price,
       is_active
@@ -86,7 +86,7 @@ router.post('/', authenticateToken, authorizeRoles('admin', 'superAdmin'), packa
 
     res.status(201).json({
       message: 'Package created successfully',
-      package
+      package: pkg
     });
   } catch (error) {
     console.error('Create package error:', error);
@@ -105,13 +105,13 @@ router.put('/:id', authenticateToken, authorizeRoles('admin', 'superAdmin'), pac
     const { id } = req.params;
     const { name, price, is_active } = req.body;
 
-    const package = await Package.findByPk(id);
+    const pkg = await Package.findByPk(id);
 
-    if (!package) {
+    if (!pkg) {
       return res.status(404).json({ message: 'Package not found' });
     }
 
-    await package.update({
+    await pkg.update({
       name,
       price,
       is_active
@@ -119,7 +119,7 @@ router.put('/:id', authenticateToken, authorizeRoles('admin', 'superAdmin'), pac
 
     res.json({
       message: 'Package updated successfully',
-      package
+      package: pkg
     });
   } catch (error) {
     console.error('Update package error:', error);
@@ -132,13 +132,13 @@ router.delete('/:id', authenticateToken, authorizeRoles('admin', 'superAdmin'), 
   try {
     const { id } = req.params;
 
-    const package = await Package.findByPk(id);
+    const pkg = await Package.findByPk(id);
 
-    if (!package) {
+    if (!pkg) {
       return res.status(404).json({ message: 'Package not found' });
     }
 
-    await package.update({ is_active: false });
+    await pkg.update({ is_active: false });
 
     res.json({
       message: 'Package deactivated successfully'

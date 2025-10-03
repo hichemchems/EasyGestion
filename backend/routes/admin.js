@@ -268,6 +268,226 @@ router.get('/expenses/categories', authenticateToken, authorizeRoles('admin', 's
   }
 });
 
+// Get sorted barbers by turnover (admin dashboard)
+router.get('/dashboard/sorted-barbers', authenticateToken, authorizeRoles('admin', 'superAdmin'), async (req, res) => {
+  try {
+    const { period = 'monthly' } = req.query;
+    const targetDate = new Date();
+
+    // Calculate date range
+    let start, end;
+    switch (period) {
+      case 'daily':
+        start = new Date(targetDate);
+        start.setHours(0, 0, 0, 0);
+        end = new Date(targetDate);
+        end.setHours(23, 59, 59, 999);
+        break;
+      case 'weekly':
+        const day = targetDate.getDay();
+        const diff = targetDate.getDate() - day + (day === 0 ? -6 : 1);
+        start = new Date(targetDate);
+        start.setDate(diff);
+        start.setHours(0, 0, 0, 0);
+        end = new Date(start);
+        end.setDate(start.getDate() + 6);
+        end.setHours(23, 59, 59, 999);
+        break;
+      case 'monthly':
+      default:
+        start = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
+        end = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0, 23, 59, 59, 999);
+        break;
+    }
+
+    const employees = await Employee.findAll({
+      include: [{
+        model: User,
+        as: 'user',
+        attributes: ['username', 'email']
+      }]
+    });
+
+    const barbersData = await Promise.all(employees.map(async (employee) => {
+      const salesTotal = await Sale.sum('amount', {
+        where: {
+          employee_id: employee.id,
+          date: { [require('sequelize').Op.between]: [start, end] }
+        }
+      }) || 0;
+
+      const receiptsTotal = await Receipt.sum('amount', {
+        where: {
+          employee_id: employee.id,
+          date: { [require('sequelize').Op.between]: [start, end] }
+        }
+      }) || 0;
+
+      const totalTurnover = parseFloat(salesTotal) + parseFloat(receiptsTotal);
+
+      return {
+        employee_id: employee.id,
+        name: employee.name,
+        position: employee.position,
+        username: employee.user.username,
+        turnover: totalTurnover,
+        sales: parseFloat(salesTotal),
+        receipts: parseFloat(receiptsTotal),
+        deduction_percentage: employee.deduction_percentage
+      };
+    }));
+
+    // Sort by turnover descending
+    barbersData.sort((a, b) => b.turnover - a.turnover);
+
+    res.json({
+      message: 'Barbers sorted by turnover retrieved successfully',
+      period,
+      date_range: { start, end },
+      barbers: barbersData
+    });
+  } catch (error) {
+    console.error('Get sorted barbers error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Get real-time charts data
+router.get('/dashboard/realtime-charts', authenticateToken, authorizeRoles('admin', 'superAdmin'), async (req, res) => {
+  try {
+    const now = new Date();
+
+    // Daily data for the last 7 days
+    const dailyData = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(now.getDate() - i);
+      const start = new Date(date);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(date);
+      end.setHours(23, 59, 59, 999);
+
+      const salesTotal = await Sale.sum('amount', {
+        where: { date: { [require('sequelize').Op.between]: [start, end] } }
+      }) || 0;
+
+      const receiptsTotal = await Receipt.sum('amount', {
+        where: { date: { [require('sequelize').Op.between]: [start, end] } }
+      }) || 0;
+
+      dailyData.push({
+        date: date.toISOString().split('T')[0],
+        turnover: parseFloat(salesTotal) + parseFloat(receiptsTotal),
+        sales: parseFloat(salesTotal),
+        receipts: parseFloat(receiptsTotal)
+      });
+    }
+
+    // Monthly data for the last 12 months
+    const monthlyData = [];
+    for (let i = 11; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const start = new Date(date.getFullYear(), date.getMonth(), 1);
+      const end = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
+
+      const salesTotal = await Sale.sum('amount', {
+        where: { date: { [require('sequelize').Op.between]: [start, end] } }
+      }) || 0;
+
+      const receiptsTotal = await Receipt.sum('amount', {
+        where: { date: { [require('sequelize').Op.between]: [start, end] } }
+      }) || 0;
+
+      monthlyData.push({
+        month: date.toISOString().slice(0, 7),
+        turnover: parseFloat(salesTotal) + parseFloat(receiptsTotal),
+        sales: parseFloat(salesTotal),
+        receipts: parseFloat(receiptsTotal)
+      });
+    }
+
+    // Yearly data for the last 5 years
+    const yearlyData = [];
+    for (let i = 4; i >= 0; i--) {
+      const year = now.getFullYear() - i;
+      const start = new Date(year, 0, 1);
+      const end = new Date(year, 11, 31, 23, 59, 59, 999);
+
+      const salesTotal = await Sale.sum('amount', {
+        where: { date: { [require('sequelize').Op.between]: [start, end] } }
+      }) || 0;
+
+      const receiptsTotal = await Receipt.sum('amount', {
+        where: { date: { [require('sequelize').Op.between]: [start, end] } }
+      }) || 0;
+
+      yearlyData.push({
+        year: year.toString(),
+        turnover: parseFloat(salesTotal) + parseFloat(receiptsTotal),
+        sales: parseFloat(salesTotal),
+        receipts: parseFloat(receiptsTotal)
+      });
+    }
+
+    res.json({
+      message: 'Real-time charts data retrieved successfully',
+      daily: dailyData,
+      monthly: monthlyData,
+      yearly: yearlyData
+    });
+  } catch (error) {
+    console.error('Get realtime charts error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Get dashboard forecast
+router.get('/dashboard/forecast', authenticateToken, authorizeRoles('admin', 'superAdmin'), async (req, res) => {
+  try {
+    const { annual_objective } = req.query;
+    const objective = annual_objective ? parseFloat(annual_objective) : 50000;
+
+    const currentYear = new Date().getFullYear();
+    const startOfYear = new Date(currentYear, 0, 1);
+    const now = new Date();
+
+    // Get year-to-date turnover
+    const salesTotal = await Sale.sum('amount', {
+      where: {
+        date: { [require('sequelize').Op.between]: [startOfYear, now] }
+      }
+    }) || 0;
+
+    const receiptsTotal = await Receipt.sum('amount', {
+      where: {
+        date: { [require('sequelize').Op.between]: [startOfYear, now] }
+      }
+    }) || 0;
+
+    const ytdTurnover = parseFloat(salesTotal) + parseFloat(receiptsTotal);
+    const percentageAchieved = objective > 0 ? (ytdTurnover / objective) * 100 : 0;
+
+    // Forecast based on current pace
+    const daysPassed = Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24)) + 1;
+    const totalDaysInYear = new Date(currentYear, 11, 31).getDate() === 29 ? 366 : 365;
+    const dailyAverage = daysPassed > 0 ? ytdTurnover / daysPassed : 0;
+    const projectedTotal = dailyAverage * totalDaysInYear;
+
+    res.json({
+      message: 'Dashboard forecast retrieved successfully',
+      year: currentYear,
+      annual_objective: objective,
+      ytd_turnover: ytdTurnover,
+      percentage_achieved: percentageAchieved,
+      projected_total: projectedTotal,
+      forecast_status: projectedTotal >= objective ? 'on_track' : 'behind'
+    });
+  } catch (error) {
+    console.error('Get dashboard forecast error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 module.exports = router;
 
 // Get all salaries (admin only)

@@ -12,6 +12,13 @@ const saleValidation = [
   body('description').optional().isLength({ max: 500 }).withMessage('Description must be less than 500 characters')
 ];
 
+// Validation rules for sale update (package_id optional)
+const saleUpdateValidation = [
+  body('package_id').optional().isInt({ min: 1 }).withMessage('Valid package ID is required'),
+  body('client_name').isLength({ min: 1 }).withMessage('Client name is required'),
+  body('description').optional().isLength({ max: 500 }).withMessage('Description must be less than 500 characters')
+];
+
 // Validation rules for receipt creation
 const receiptValidation = [
   body('client_name').isLength({ min: 1 }).withMessage('Client name is required'),
@@ -80,11 +87,11 @@ router.post('/:id/sales', authenticateToken, canAccessEmployee, saleValidation, 
     const { package_id, client_name, description } = req.body;
 
     // Check if package exists and is active
-    const package = await Package.findOne({
+    const pkg = await Package.findOne({
       where: { id: package_id, is_active: true }
     });
 
-    if (!package) {
+    if (!pkg) {
       return res.status(400).json({ message: 'Invalid or inactive package' });
     }
 
@@ -93,7 +100,7 @@ router.post('/:id/sales', authenticateToken, canAccessEmployee, saleValidation, 
       employee_id: id,
       package_id,
       client_name,
-      amount: package.price,
+      amount: pkg.price,
       description
     });
 
@@ -115,8 +122,7 @@ router.post('/:id/sales', authenticateToken, canAccessEmployee, saleValidation, 
   }
 });
 
-// Update sale
-router.put('/:id/sales/:saleId', authenticateToken, canAccessEmployee, saleValidation, async (req, res) => {
+router.put('/:id/sales/:saleId', authenticateToken, canAccessEmployee, saleUpdateValidation, async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -136,12 +142,12 @@ router.put('/:id/sales/:saleId', authenticateToken, canAccessEmployee, saleValid
     }
 
     // If package_id changed, validate new package
-    if (package_id !== sale.package_id) {
-      const package = await Package.findOne({
+    if (package_id && package_id !== sale.package_id) {
+      const pkg = await Package.findOne({
         where: { id: package_id, is_active: true }
       });
 
-      if (!package) {
+      if (!pkg) {
         return res.status(400).json({ message: 'Invalid or inactive package' });
       }
 
@@ -149,7 +155,7 @@ router.put('/:id/sales/:saleId', authenticateToken, canAccessEmployee, saleValid
       await sale.update({
         package_id,
         client_name,
-        amount: package.price,
+        amount: pkg.price,
         description
       });
     } else {
@@ -305,6 +311,61 @@ router.delete('/:id/receipts/:receiptId', authenticateToken, canAccessEmployee, 
     });
   } catch (error) {
     console.error('Delete receipt error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Get remaining revenue for employee (current month receipts and sales minus percentage charges)
+router.get('/:id/remaining-revenue', authenticateToken, canAccessEmployee, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const currentDate = new Date();
+    const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59, 999);
+
+    // Get employee's deduction percentage
+    const employee = await Employee.findByPk(id);
+    if (!employee) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    // Get sales for current month
+    const salesTotal = await Sale.sum('amount', {
+      where: {
+        employee_id: id,
+        date: {
+          [Op.between]: [startOfMonth, endOfMonth]
+        }
+      }
+    }) || 0;
+
+    // Get receipts for current month
+    const receiptsTotal = await Receipt.sum('amount', {
+      where: {
+        employee_id: id,
+        date: {
+          [Op.between]: [startOfMonth, endOfMonth]
+        }
+      }
+    }) || 0;
+
+    const totalRevenue = parseFloat(salesTotal) + parseFloat(receiptsTotal);
+    const charges = totalRevenue * (employee.deduction_percentage / 100);
+    const remainingRevenue = totalRevenue - charges;
+
+    res.json({
+      message: 'Remaining revenue calculated successfully',
+      employee_id: id,
+      month: currentDate.toISOString().slice(0, 7),
+      total_revenue: totalRevenue,
+      sales: parseFloat(salesTotal),
+      receipts: parseFloat(receiptsTotal),
+      deduction_percentage: employee.deduction_percentage,
+      charges: charges,
+      remaining_revenue: remainingRevenue
+    });
+  } catch (error) {
+    console.error('Get remaining revenue error:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
