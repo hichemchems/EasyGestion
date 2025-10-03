@@ -5,9 +5,10 @@ const router = express.Router();
 const authRoutes = require('./auth');
 const userRoutes = require('./users');
 const packageRoutes = require('./packages');
-// const salesRoutes = require('./sales');
-// const analyticsRoutes = require('./analytics');
+const employeeRoutes = require('./employees');
+const analyticsRoutes = require('./analytics');
 const adminRoutes = require('./admin');
+const adminChargesRoutes = require('./adminCharges');
 
 // Example route
 router.get('/', (req, res) => {
@@ -18,8 +19,9 @@ router.get('/', (req, res) => {
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/packages', packageRoutes);
-// router.use('/sales', salesRoutes);
-// router.use('/analytics', analyticsRoutes);
+router.use('/employees', employeeRoutes);
+router.use('/analytics', analyticsRoutes);
 router.use('/admins', adminRoutes);
+router.use('/admin-charges', adminChargesRoutes);
 
 module.exports = router;

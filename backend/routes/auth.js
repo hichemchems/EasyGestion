@@ -1,6 +1,8 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const { body, validationResult } = require('express-validator');
 const { User } = require('../models');
 
@@ -171,6 +173,111 @@ router.post('/refresh-token', async (req, res) => {
     res.json({ message: 'Token refreshed successfully' });
   } catch (error) {
     res.status(401).json({ message: 'Invalid token' });
+  }
+ });
+
+// Password reset request
+router.post('/password-reset-request', [
+  body('email').isEmail().withMessage('Please provide a valid email')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { email } = req.body;
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Generate reset token and expiration
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpires = Date.now() + 3600000; // 1 hour
+
+    // Save token and expiration to user (you may need to add these fields to User model and DB)
+    user.reset_token = resetToken;
+    user.reset_token_expires = resetTokenExpires;
+    await user.save();
+
+    // For testing purposes, log the reset token instead of sending email
+    console.log(`Password reset token for ${email}: ${resetToken}`);
+
+    // In production, uncomment the email sending code below
+    /*
+    // Send email with reset link (configure your SMTP transporter)
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      secure: process.env.SMTP_SECURE === 'true',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+      }
+    });
+
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+
+    const mailOptions = {
+      from: process.env.SMTP_FROM,
+      to: user.email,
+      subject: 'Password Reset Request',
+      text: `You requested a password reset. Click the link to reset your password: ${resetUrl}`,
+      html: `<p>You requested a password reset. Click the link to reset your password:</p><p><a href="${resetUrl}">${resetUrl}</a></p>`
+    };
+
+    await transporter.sendMail(mailOptions);
+    */
+
+    res.json({ message: 'Password reset email sent' });
+  } catch (error) {
+    console.error('Password reset request error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Password reset
+router.post('/password-reset', [
+  body('token').exists().withMessage('Reset token is required'),
+  body('password').isLength({ min: 14 }).withMessage('Password must be at least 14 characters')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { token, password } = req.body;
+
+    const user = await User.findOne({
+      where: {
+        reset_token: token,
+        reset_token_expires: { [require('sequelize').Op.gt]: Date.now() }
+      }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired reset token' });
+    }
+
+    // Hash new password
+    const saltRounds = 12;
+    const password_hash = await bcrypt.hash(password, saltRounds);
+
+    // Update password and clear reset token
+    user.password_hash = password_hash;
+    user.reset_token = null;
+    user.reset_token_expires = null;
+    await user.save();
+
+    res.json({ message: 'Password reset successful' });
+  } catch (error) {
+    console.error('Password reset error:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 

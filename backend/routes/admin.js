@@ -4,7 +4,8 @@ const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const path = require('path');
 const fs = require('fs');
-const { User } = require('../models');
+const { User, Expense, Salary, Employee, Sale, Receipt, AdminCharge } = require('../models');
+const { authenticateToken, authorizeRoles } = require('../middleware/auth');
 
 console.log('Admin routes loaded');
 
@@ -20,6 +21,22 @@ const adminCreationValidation = [
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
     .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
   body('name').isLength({ min: 2 }).withMessage('Name is required')
+];
+
+// Validation rules for expense creation
+const expenseValidation = [
+  body('category').isLength({ min: 1 }).withMessage('Category is required'),
+  body('amount').isFloat({ min: 0.01 }).withMessage('Amount must be greater than 0'),
+  body('description').optional().isLength({ max: 500 }).withMessage('Description must be less than 500 characters')
+];
+
+// Validation rules for salary creation
+const salaryValidation = [
+  body('employee_id').isInt({ min: 1 }).withMessage('Valid employee ID is required'),
+  body('base_salary').isFloat({ min: 0 }).withMessage('Base salary must be a positive number'),
+  body('commission_percentage').isFloat({ min: 0, max: 100 }).withMessage('Commission percentage must be between 0 and 100'),
+  body('period_start').isISO8601().withMessage('Period start must be a valid date'),
+  body('period_end').isISO8601().withMessage('Period end must be a valid date')
 ];
 
 // Generate JWT token
@@ -123,4 +140,248 @@ router.post('/', adminCreationValidation, async (req, res) => {
   }
 });
 
+// Get all expenses (admin only)
+router.get('/expenses', authenticateToken, authorizeRoles('admin', 'superAdmin'), async (req, res) => {
+  try {
+    const { category, start_date, end_date } = req.query;
+
+    const whereClause = {};
+    if (category) {
+      whereClause.category = category;
+    }
+    if (start_date && end_date) {
+      whereClause.date = {
+        [require('sequelize').Op.between]: [new Date(start_date), new Date(end_date)]
+      };
+    }
+
+    const expenses = await Expense.findAll({
+      where: whereClause,
+      order: [['date', 'DESC']]
+    });
+
+    res.json({
+      message: 'Expenses retrieved successfully',
+      expenses
+    });
+  } catch (error) {
+    console.error('Get expenses error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Create expense (admin only)
+router.post('/expenses', authenticateToken, authorizeRoles('admin', 'superAdmin'), expenseValidation, async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { category, amount, description } = req.body;
+    const created_by = req.user.id;
+
+    const expense = await Expense.create({
+      category,
+      amount,
+      description,
+      created_by
+    });
+
+    res.status(201).json({
+      message: 'Expense created successfully',
+      expense
+    });
+  } catch (error) {
+    console.error('Create expense error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Update expense (admin only)
+router.put('/expenses/:id', authenticateToken, authorizeRoles('admin', 'superAdmin'), expenseValidation, async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { id } = req.params;
+    const { category, amount, description } = req.body;
+
+    const expense = await Expense.findByPk(id);
+
+    if (!expense) {
+      return res.status(404).json({ message: 'Expense not found' });
+    }
+
+    await expense.update({
+      category,
+      amount,
+      description
+    });
+
+    res.json({
+      message: 'Expense updated successfully',
+      expense
+    });
+  } catch (error) {
+    console.error('Update expense error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Delete expense (admin only)
+router.delete('/expenses/:id', authenticateToken, authorizeRoles('admin', 'superAdmin'), async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const expense = await Expense.findByPk(id);
+
+    if (!expense) {
+      return res.status(404).json({ message: 'Expense not found' });
+    }
+
+    await expense.destroy();
+
+    res.json({
+      message: 'Expense deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete expense error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Get expense categories
+router.get('/expenses/categories', authenticateToken, authorizeRoles('admin', 'superAdmin'), async (req, res) => {
+  try {
+    const categories = await Expense.findAll({
+      attributes: [
+        [require('sequelize').fn('DISTINCT', require('sequelize').col('category')), 'category']
+      ],
+      raw: true
+    });
+
+    const categoryList = categories.map(cat => cat.category);
+
+    res.json({
+      message: 'Expense categories retrieved successfully',
+      categories: categoryList
+    });
+  } catch (error) {
+    console.error('Get expense categories error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 module.exports = router;
+
+// Get all salaries (admin only)
+router.get('/salaries', authenticateToken, authorizeRoles('admin', 'superAdmin'), async (req, res) => {
+  try {
+    const salaries = await Salary.findAll({
+      include: [{
+        model: Employee,
+        as: 'employee',
+        attributes: ['id', 'name', 'position']
+      }],
+      order: [['period_start', 'DESC']]
+    });
+
+    res.json({
+      message: 'Salaries retrieved successfully',
+      salaries
+    });
+  } catch (error) {
+    console.error('Get salaries error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Create salary (admin only)
+router.post('/salaries', authenticateToken, authorizeRoles('admin', 'superAdmin'), salaryValidation, async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { employee_id, base_salary, commission_percentage, period_start, period_end } = req.body;
+
+    const salary = await Salary.create({
+      employee_id,
+      base_salary,
+      commission_percentage,
+      total_salary: base_salary + (base_salary * commission_percentage / 100),
+      period_start,
+      period_end
+    });
+
+    res.status(201).json({
+      message: 'Salary created successfully',
+      salary
+    });
+  } catch (error) {
+    console.error('Create salary error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Update salary (admin only)
+router.put('/salaries/:id', authenticateToken, authorizeRoles('admin', 'superAdmin'), salaryValidation, async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { id } = req.params;
+    const { employee_id, base_salary, commission_percentage, period_start, period_end } = req.body;
+
+    const salary = await Salary.findByPk(id);
+
+    if (!salary) {
+      return res.status(404).json({ message: 'Salary not found' });
+    }
+
+    await salary.update({
+      employee_id,
+      base_salary,
+      commission_percentage,
+      total_salary: base_salary + (base_salary * commission_percentage / 100),
+      period_start,
+      period_end
+    });
+
+    res.json({
+      message: 'Salary updated successfully',
+      salary
+    });
+  } catch (error) {
+    console.error('Update salary error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Delete salary (admin only)
+router.delete('/salaries/:id', authenticateToken, authorizeRoles('admin', 'superAdmin'), async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const salary = await Salary.findByPk(id);
+
+    if (!salary) {
+      return res.status(404).json({ message: 'Salary not found' });
+    }
+
+    await salary.destroy();
+
+    res.json({
+      message: 'Salary deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete salary error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});

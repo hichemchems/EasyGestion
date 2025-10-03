@@ -32,22 +32,7 @@ const Employee = sequelize.define('Employee', {
     allowNull: false,
     defaultValue: 0.00
   },
-  contract_path: {
-    type: DataTypes.STRING(255),
-    allowNull: true
-  },
-  employment_declaration_path: {
-    type: DataTypes.STRING(255),
-    allowNull: true
-  },
-  certification_path: {
-    type: DataTypes.STRING(255),
-    allowNull: true
-  },
-  avatar_path: {
-    type: DataTypes.STRING(255),
-    allowNull: true
-  }
+
 }, {
   tableName: 'employees',
   timestamps: false

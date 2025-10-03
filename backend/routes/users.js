@@ -27,7 +27,7 @@ router.get('/', authenticateToken, authorizeRoles('admin', 'superAdmin'), async 
     const users = await User.findAll({
       include: [{
         model: Employee,
-        as: 'employee'
+        as: 'Employee'
       }],
       attributes: { exclude: ['password_hash'] }
     });
@@ -117,11 +117,7 @@ router.post('/', authenticateToken, authorizeRoles('admin', 'superAdmin'), userC
       name,
       position,
       hire_date,
-      deduction_percentage,
-      avatar_path: avatarPath,
-      contract_path: contractPath,
-      employment_declaration_path: employmentDeclarationPath,
-      certification_path: certificationPath
+      deduction_percentage
     });
 
     // Add certification to user if needed, but for now skip
@@ -185,7 +181,7 @@ router.delete('/:id', authenticateToken, authorizeRoles('admin', 'superAdmin'), 
     const { id } = req.params;
 
     const user = await User.findByPk(id, {
-      include: [{ model: Employee, as: 'employee' }]
+      include: [{ model: Employee, as: 'Employee' }]
     });
 
     if (!user) {
@@ -193,8 +189,8 @@ router.delete('/:id', authenticateToken, authorizeRoles('admin', 'superAdmin'), 
     }
 
     // Delete employee first
-    if (user.employee) {
-      await user.employee.destroy();
+    if (user.Employee) {
+      await user.Employee.destroy();
     }
 
     // Delete user

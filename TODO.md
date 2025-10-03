@@ -80,12 +80,12 @@
   - DELETE /api/users/:id
 
 ### 7. Package and Sales API (Core Feature)
-- [ ] Package management endpoints (admin):
+- [x] Package management endpoints (admin):
   - GET /api/packages (get all active packages)
   - POST /api/packages (create new package)
   - PUT /api/packages/:id (update package)
   - DELETE /api/packages/:id (deactivate package)
-- [ ] Sales endpoints (users/barbers):
+- [x] Sales endpoints (users/barbers):
   - GET /api/employees/:id/sales (get sales for employee)
   - POST /api/employees/:id/sales (create sale from package selection)
   - PUT /api/employees/:id/sales/:saleId

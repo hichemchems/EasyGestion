@@ -75,7 +75,7 @@ const startServer = async () => {
     await testConnection();
 
     // Sync database (create tables if they don't exist)
-    await sequelize.sync({ force: false }); // Set force: true to drop and recreate tables
+    await sequelize.sync({ alter: true }); // Set force: true to drop and recreate tables
     console.log('Database synchronized successfully.');
 
     // Seed initial data

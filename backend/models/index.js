@@ -8,6 +8,7 @@ const Sale = require('./Sale');
 const Receipt = require('./Receipt');
 const Expense = require('./Expense');
 const Salary = require('./Salary');
+const AdminCharge = require('./AdminCharge');
 
 // Define associations
 User.hasOne(Employee, { foreignKey: 'user_id', onDelete: 'CASCADE' });
@@ -34,5 +35,6 @@ module.exports = {
   Sale,
   Receipt,
   Expense,
-  Salary
+  Salary,
+  AdminCharge
 };
