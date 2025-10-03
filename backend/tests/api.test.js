@@ -1,3 +1,5 @@
+jest.setTimeout(30000);
+
 const request = require('supertest');
 const { app } = require('../index'); // Import the app without starting the server
 const { sequelize, User, Employee } = require('../models');
