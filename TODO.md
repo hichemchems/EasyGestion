@@ -1,11 +1,11 @@
 # TODO List for EasyGestion API Development (Prioritized by Importance and Logical Order)
 
-## Phase 1: Foundation (Most Critical - Start Here)
+## Phase 1: Foundation (Most Critical - Start Here) [x]
 ### 1. Project Setup and Structure
-- [ ] Initialize the project directory structure (backend and frontend folders)
-- [ ] Set up version control (Git repository)
-- [ ] Create comprehensive README.md with project overview, setup instructions, API documentation, and usage guide
-- [ ] Define project architecture (backend API + React frontend)
+- [x] Initialize the project directory structure (backend and frontend folders)
+- [x] Set up version control (Git repository)
+- [x] Create comprehensive README.md with project overview, setup instructions, API documentation, and usage guide
+- [x] Define project architecture (backend API + React frontend)
 
 ### 2. Database Setup (MySQL)
 - [x] Design database schema:
@@ -63,16 +63,16 @@
 - [x] Add security headers (helmet)
 - [ ] Implement logging and monitoring
 
-## Phase 3: Core API Functionality (Business Logic)
+## Phase 3: Core API Functionality (Business Logic) [x]
 ### 6. Basic API Endpoints Development
-- [ ] Authentication endpoints:
+- [x] Authentication endpoints:
   - POST /api/auth/register
   - POST /api/auth/login
   - POST /api/auth/logout
   - POST /api/auth/refresh-token
-- [ ] Admin creation endpoint (homepage):
+- [x] Admin creation endpoint (homepage):
   - POST /api/admins (with logo upload, validation for email, siret 14 digits, phone, password constraints)
-- [ ] User management endpoints (admin/superAdmin):
+- [x] User management endpoints (admin/superAdmin):
   - GET /api/users
   - POST /api/users (create barber with avatar photo upload and document uploads: contract, employment declaration, certification)
   - PUT /api/users/:id

@@ -10,31 +10,22 @@ const Expense = require('./Expense');
 const Salary = require('./Salary');
 
 // Define associations
-User.hasOne(Employee, { foreignKey: 'user_id', as: 'employee' });
-Employee.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+User.hasOne(Employee, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+Employee.belongsTo(User, { foreignKey: 'user_id' });
 
-Employee.hasMany(Sale, { foreignKey: 'employee_id', as: 'sales' });
-Sale.belongsTo(Employee, { foreignKey: 'employee_id', as: 'employee' });
+Employee.hasMany(Sale, { foreignKey: 'employee_id', onDelete: 'CASCADE' });
+Sale.belongsTo(Employee, { foreignKey: 'employee_id' });
 
-Package.hasMany(Sale, { foreignKey: 'package_id', as: 'sales' });
-Sale.belongsTo(Package, { foreignKey: 'package_id', as: 'package' });
+Package.hasMany(Sale, { foreignKey: 'package_id', onDelete: 'CASCADE' });
+Sale.belongsTo(Package, { foreignKey: 'package_id' });
 
-Employee.hasMany(Receipt, { foreignKey: 'employee_id', as: 'receipts' });
-Receipt.belongsTo(Employee, { foreignKey: 'employee_id', as: 'employee' });
+Employee.hasMany(Receipt, { foreignKey: 'employee_id', onDelete: 'CASCADE' });
+Receipt.belongsTo(Employee, { foreignKey: 'employee_id' });
 
-Employee.hasMany(Salary, { foreignKey: 'employee_id', as: 'salaries' });
-Salary.belongsTo(Employee, { foreignKey: 'employee_id', as: 'employee' });
+Employee.hasMany(Salary, { foreignKey: 'employee_id', onDelete: 'CASCADE' });
+Salary.belongsTo(Employee, { foreignKey: 'employee_id' });
 
-// Sync database (for development only)
-const syncDatabase = async () => {
-  try {
-    await sequelize.sync({ force: false }); // Set force: true to drop and recreate tables
-    console.log('Database synchronized successfully.');
-  } catch (error) {
-    console.error('Error synchronizing database:', error);
-  }
-};
-
+// Export models
 module.exports = {
   sequelize,
   User,
@@ -43,6 +34,5 @@ module.exports = {
   Sale,
   Receipt,
   Expense,
-  Salary,
-  syncDatabase
+  Salary
 };

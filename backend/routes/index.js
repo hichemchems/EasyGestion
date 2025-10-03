@@ -3,11 +3,11 @@ const router = express.Router();
 
 // Import route modules here
 const authRoutes = require('./auth');
-// const userRoutes = require('./users');
-// const packageRoutes = require('./packages');
+const userRoutes = require('./users');
+const packageRoutes = require('./packages');
 // const salesRoutes = require('./sales');
 // const analyticsRoutes = require('./analytics');
-// const adminRoutes = require('./admin');
+const adminRoutes = require('./admin');
 
 // Example route
 router.get('/', (req, res) => {
@@ -16,10 +16,10 @@ router.get('/', (req, res) => {
 
 // Use route modules
 router.use('/auth', authRoutes);
-// router.use('/users', userRoutes);
-// router.use('/packages', packageRoutes);
+router.use('/users', userRoutes);
+router.use('/packages', packageRoutes);
 // router.use('/sales', salesRoutes);
 // router.use('/analytics', analyticsRoutes);
-// router.use('/admin', adminRoutes);
+router.use('/admins', adminRoutes);
 
 module.exports = router;
