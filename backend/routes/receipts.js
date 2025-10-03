@@ -2,6 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { Receipt, Employee } = require('../models');
 const { authenticateToken, authorizeRoles } = require('../middleware/auth');
+const { io } = require('../index');
 
 const router = express.Router();
 
@@ -73,6 +74,12 @@ router.post('/:id/receipts', authenticateToken, canAccessEmployee, receiptValida
       client_name,
       amount,
       description
+    });
+
+    // Emit real-time update
+    io.emit('receipt-created', {
+      employee_id: id,
+      receipt: receipt
     });
 
     res.status(201).json({
