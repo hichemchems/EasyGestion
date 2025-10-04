@@ -51,7 +51,7 @@
 - [x] Create middleware for authentication (verify JWT)
 - [x] Implement role-based access control (superAdmin, admin, user/barber)
 - [x] Set up password hashing with bcrypt
-- [ ] Implement password reset functionality
+- [x] Implement password reset functionality
 - [x] Add session management with secure cookies
 
 ### 5. Security Implementations
@@ -206,15 +206,15 @@
 
 ## Phase 7: Deployment and Infrastructure
 ### 12. Dockerization
-- [ ] Create Dockerfile for backend
-- [ ] Create Dockerfile for frontend
-- [ ] Set up docker-compose.yml with services:
+- [x] Create Dockerfile for backend
+- [x] Create Dockerfile for frontend
+- [x] Set up docker-compose.yml with services:
   - MySQL database
   - Backend API
   - Frontend React app
   - Nginx (reverse proxy)
-- [ ] Configure environment variables for Docker
-- [ ] Add Docker ignore files
+- [x] Configure environment variables for Docker
+- [x] Add Docker ignore files
 
 ### 13. Deployment and Production Setup
 - [ ] Set up CI/CD pipeline (GitHub Actions)
