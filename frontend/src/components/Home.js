@@ -36,7 +36,7 @@ const Home = () => {
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     onDropRejected,
-    accept: 'image/*',
+    accept: { 'image/*': [] },
     multiple: false
   });
 
