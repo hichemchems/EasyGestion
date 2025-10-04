@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import AdminDashboard from './components/AdminDashboard';
 import CreateEmployee from './components/CreateEmployee';
 import ExpenseManagement from './components/ExpenseManagement';
@@ -12,57 +12,71 @@ import UserDashboard from './components/UserDashboard';
 import { AuthProvider } from './contexts/AuthContext';
 import './index.css';
 
+const router = createBrowserRouter([
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/admin/dashboard",
+    element: (
+      <ProtectedRoute allowedRoles={['admin', 'superAdmin']}>
+        <AdminDashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/create-employee",
+    element: (
+      <ProtectedRoute allowedRoles={['admin', 'superAdmin']}>
+        <CreateEmployee />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/expenses",
+    element: (
+      <ProtectedRoute allowedRoles={['admin', 'superAdmin']}>
+        <ExpenseManagement />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/salaries",
+    element: (
+      <ProtectedRoute allowedRoles={['admin', 'superAdmin']}>
+        <SalaryViewing />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/dashboard",
+    element: (
+      <ProtectedRoute allowedRoles={['user', 'barber']}>
+        <UserDashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/",
+    element: <Home />,
+  },
+  {
+    path: "*",
+    element: <Login />,
+  },
+], {
+  future: {
+    v7_startTransition: true,
+    v7_relativeSplatPath: true,
+  },
+});
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/admin/dashboard"
-            element={
-              <ProtectedRoute allowedRoles={['admin', 'superAdmin']}>
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/create-employee"
-            element={
-              <ProtectedRoute allowedRoles={['admin', 'superAdmin']}>
-                <CreateEmployee />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/expenses"
-            element={
-              <ProtectedRoute allowedRoles={['admin', 'superAdmin']}>
-                <ExpenseManagement />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/salaries"
-            element={
-              <ProtectedRoute allowedRoles={['admin', 'superAdmin']}>
-                <SalaryViewing />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute allowedRoles={['user', 'barber']}>
-                <UserDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/" element={<Home />} />
-          <Route path="*" element={<Login />} />
-        </Routes>
-      </BrowserRouter>
+      <RouterProvider router={router} />
     </AuthProvider>
   </React.StrictMode>
 );

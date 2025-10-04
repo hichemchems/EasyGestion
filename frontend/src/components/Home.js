@@ -89,7 +89,7 @@ const Home = () => {
     }
 
     try {
-      await axios.post('/api/admins', formData, {
+      await axios.post('/api/v1/admin', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
