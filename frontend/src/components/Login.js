@@ -65,6 +65,11 @@ const Login = () => {
             {loading ? 'Connexion...' : 'Se connecter'}
           </button>
         </form>
+        <div style={styles.backLink}>
+          <button onClick={() => navigate('/')} style={styles.backButton}>
+            Retour à la création d'admin
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -132,6 +137,18 @@ const styles = {
     marginBottom: '15px',
     textAlign: 'center',
     fontWeight: 'bold'
+  },
+  backLink: {
+    textAlign: 'center',
+    marginTop: '20px'
+  },
+  backButton: {
+    backgroundColor: 'transparent',
+    color: '#007bff',
+    border: 'none',
+    textDecoration: 'underline',
+    cursor: 'pointer',
+    fontSize: '16px'
   }
 };
 
