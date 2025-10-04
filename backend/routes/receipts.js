@@ -118,6 +118,12 @@ router.put('/:id/receipts/:receiptId', authenticateToken, canAccessEmployee, rec
       description
     });
 
+    // Emit real-time update
+    io.emit('receipt-updated', {
+      employee_id: id,
+      receipt: receipt
+    });
+
     res.json({
       message: 'Receipt updated successfully',
       receipt
@@ -143,6 +149,12 @@ router.delete('/:id/receipts/:receiptId', authenticateToken, canAccessEmployee, 
     }
 
     await receipt.destroy();
+
+    // Emit real-time update
+    io.emit('receipt-deleted', {
+      employee_id: id,
+      receipt_id: receiptId
+    });
 
     res.json({
       message: 'Receipt deleted successfully'
