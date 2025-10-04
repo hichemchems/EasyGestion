@@ -1,10 +1,8 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useEffect, useState, useCallback } from 'react';
 import '../styles/colors.css';
 
 const SalaryViewing = () => {
-  const { user } = useAuth();
   const [salaries, setSalaries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedEmployee, setSelectedEmployee] = useState('');
@@ -13,11 +11,7 @@ const SalaryViewing = () => {
     end_date: ''
   });
 
-  useEffect(() => {
-    fetchSalaries();
-  }, [selectedEmployee, period]);
-
-  const fetchSalaries = async () => {
+  const fetchSalaries = useCallback(async () => {
     try {
       const params = {};
       if (selectedEmployee) params.employee_id = selectedEmployee;
@@ -31,7 +25,11 @@ const SalaryViewing = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedEmployee, period]);
+
+  useEffect(() => {
+    fetchSalaries();
+  }, [fetchSalaries]);
 
   const handleGenerateSalary = async (employeeId) => {
     try {

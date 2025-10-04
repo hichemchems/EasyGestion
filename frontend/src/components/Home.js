@@ -61,7 +61,7 @@ const Home = () => {
       setError('SIRET must be exactly 14 digits');
       return false;
     }
-    if (!/^[\+]?[0-9][\d]{0,14}$/.test(phone) || phone.length < 10) {
+    if (!/^[+]?[0-9][\d]{0,14}$/.test(phone) || phone.length < 10) {
       setError('Invalid phone number. Please enter a valid phone number (at least 10 digits)');
       return false;
     }

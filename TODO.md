@@ -19,3 +19,4 @@
 
 - [x] Fix admin creation form issue (CORS fixed, should work now)
 - [x] Add back buttons when logged in to return to creation form if wrong route
+- [x] Fix ESLint warnings (unused variables, missing dependencies, unnecessary escapes)

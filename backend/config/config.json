@@ -1,0 +1,26 @@
+{
+  "development": {
+    "username": "easygestionuser",
+    "password": "easygestionpass",
+    "database": "easygestion",
+    "host": "db",
+    "port": 3306,
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "easygestionuser",
+    "password": "easygestionpass",
+    "database": "easygestion_test",
+    "host": "db",
+    "port": 3306,
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "easygestionuser",
+    "password": "easygestionpass",
+    "database": "easygestion",
+    "host": "db",
+    "port": 3306,
+    "dialect": "mysql"
+  }
+}
