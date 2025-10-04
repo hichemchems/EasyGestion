@@ -11,6 +11,7 @@ const seedUsers = async () => {
 
     if (!existingSuperAdmin) {
       await User.create({
+        username: 'superadmin',
         email: 'superadmin@gmail.com',
         password_hash: passwordHash,
         role: 'superAdmin'
@@ -20,6 +21,7 @@ const seedUsers = async () => {
 
     if (!existingAdmin) {
       await User.create({
+        username: 'admin',
         email: 'admin@gmail.com',
         password_hash: passwordHash,
         role: 'admin'
