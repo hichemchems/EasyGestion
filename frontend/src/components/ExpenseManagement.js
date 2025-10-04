@@ -1,10 +1,8 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useCallback, useEffect, useState } from 'react';
 import '../styles/colors.css';
 
 const ExpenseManagement = () => {
-  const { user } = useAuth();
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -19,11 +17,7 @@ const ExpenseManagement = () => {
     end_date: ''
   });
 
-  useEffect(() => {
-    fetchExpenses();
-  }, [filters]);
-
-  const fetchExpenses = async () => {
+  const fetchExpenses = useCallback(async () => {
     try {
       const params = {};
       if (filters.category) params.category = filters.category;
@@ -37,7 +31,11 @@ const ExpenseManagement = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
+
+  useEffect(() => {
+    fetchExpenses();
+  }, [fetchExpenses]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -58,7 +56,7 @@ const ExpenseManagement = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette dépense?')) return;
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette dépense?')) return;
 
     try {
       await axios.delete(`/api/expenses/${id}`);

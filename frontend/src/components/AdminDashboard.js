@@ -12,7 +12,6 @@ const AdminDashboard = () => {
   const { user, logout } = useAuth();
   const [barbers, setBarbers] = useState([]);
   const [charts, setCharts] = useState({ daily: [], monthly: [], yearly: [] });
-  const [forecast, setForecast] = useState({});
   const [indicators, setIndicators] = useState({});
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -34,7 +33,6 @@ const AdminDashboard = () => {
 
       setBarbers(barbersRes.data.barbers || []);
       setCharts(chartsRes.data);
-      setForecast(forecastRes.data);
       setIndicators({
         averageBasket: basketRes.data.average_basket,
         clientCount: clientRes.data.client_count,
@@ -115,12 +113,12 @@ const AdminDashboard = () => {
             <div style={styles.indicatorLabel}>Chiffre d'Affaires Journalier</div>
           </div>
           <div style={styles.indicatorCard}>
-            <div style={styles.indicatorValue}>{indicators.forecastPercentage?.toFixed(1) || '0.0'}%</div>
-            <div style={styles.indicatorLabel}>Prévision</div>
-            <div style={styles.progressBar}>
-              <div style={{...styles.progressFill, width: `${indicators.forecastPercentage || 0}%`}}></div>
-            </div>
+          <div style={styles.indicatorValue}>0.0%</div>
+          <div style={styles.indicatorLabel}>Prévision</div>
+          <div style={styles.progressBar}>
+            <div style={{...styles.progressFill, width: `0%`}}></div>
           </div>
+        </div>
         </div>
 
         {/* Menu Buttons */}
