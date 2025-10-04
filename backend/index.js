@@ -81,7 +81,9 @@ const startServer = async () => {
 
     // Seed initial data
     const seedPackages = require('./seeders/packages');
+    const seedUsers = require('./seeders/users');
     await seedPackages();
+    await seedUsers();
 
     // Start server
     server.listen(PORT, () => {

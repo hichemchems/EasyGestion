@@ -2,6 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { Sale, Package, Employee, Receipt } = require('../models');
 const { authenticateToken, authorizeRoles } = require('../middleware/auth');
+const { io } = require('../index');
 
 const router = express.Router();
 
@@ -112,6 +113,12 @@ router.post('/:id/sales', authenticateToken, canAccessEmployee, saleValidation, 
       }]
     });
 
+    // Emit real-time update for sale creation
+    io.emit('sale-created', {
+      employee_id: id,
+      sale: createdSale
+    });
+
     res.status(201).json({
       message: 'Sale created successfully',
       sale: createdSale
@@ -173,6 +180,12 @@ router.put('/:id/sales/:saleId', authenticateToken, canAccessEmployee, saleUpdat
       }]
     });
 
+    // Emit real-time update for sale update
+    io.emit('sale-updated', {
+      employee_id: id,
+      sale: updatedSale
+    });
+
     res.json({
       message: 'Sale updated successfully',
       sale: updatedSale
@@ -198,6 +211,12 @@ router.delete('/:id/sales/:saleId', authenticateToken, canAccessEmployee, async 
     }
 
     await sale.destroy();
+
+    // Emit real-time update for sale deletion
+    io.emit('sale-deleted', {
+      employee_id: id,
+      sale_id: saleId
+    });
 
     res.json({
       message: 'Sale deleted successfully'

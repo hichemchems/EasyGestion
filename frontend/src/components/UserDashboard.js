@@ -6,36 +6,83 @@ import '../styles/colors.css';
 const UserDashboard = () => {
   const { user, logout } = useAuth();
   const [packages, setPackages] = useState([]);
-  const [analytics, setAnalytics] = useState({});
+  const [selectedPackage, setSelectedPackage] = useState(null);
+  const [clientName, setClientName] = useState('');
+  const [receiptAmount, setReceiptAmount] = useState('');
+  const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({});
 
   useEffect(() => {
-    fetchDashboardData();
+    fetchData();
   }, []);
 
-  const fetchDashboardData = async () => {
+  const fetchData = async () => {
     try {
-      const [packagesRes, analyticsRes] = await Promise.all([
+      const [packagesRes, statsRes] = await Promise.all([
         axios.get('/api/packages'),
-        axios.get('/api/analytics/realtime-daily-turnover')
+        axios.get(`/api/employees/${user?.id}/remaining-revenue`)
       ]);
 
       setPackages(packagesRes.data.packages || []);
-      setAnalytics(analyticsRes.data);
+      setStats(statsRes.data);
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLogout = () => {
-    logout();
+  const handlePackageSelect = (pkg) => {
+    setSelectedPackage(pkg);
   };
 
-  const handlePackageSelect = (pkg) => {
-    // TODO: Implement package selection logic
-    console.log('Selected package:', pkg);
+  const handleSaleSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedPackage || !clientName) return;
+
+    try {
+      await axios.post(`/api/employees/${user?.id}/sales`, {
+        package_id: selectedPackage.id,
+        client_name: clientName,
+        description
+      });
+
+      alert('Vente enregistrée avec succès!');
+      setSelectedPackage(null);
+      setClientName('');
+      setDescription('');
+      fetchData(); // Refresh stats
+    } catch (error) {
+      console.error('Error creating sale:', error);
+      alert('Erreur lors de l\'enregistrement de la vente');
+    }
+  };
+
+  const handleReceiptSubmit = async (e) => {
+    e.preventDefault();
+    if (!receiptAmount || !clientName) return;
+
+    try {
+      await axios.post(`/api/employees/${user?.id}/receipts`, {
+        client_name: clientName,
+        amount: parseFloat(receiptAmount),
+        description
+      });
+
+      alert('Reçu enregistré avec succès!');
+      setReceiptAmount('');
+      setClientName('');
+      setDescription('');
+      fetchData(); // Refresh stats
+    } catch (error) {
+      console.error('Error creating receipt:', error);
+      alert('Erreur lors de l\'enregistrement du reçu');
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
   };
 
   if (loading) {
@@ -46,33 +93,57 @@ const UserDashboard = () => {
     <div style={styles.container}>
       {/* Header */}
       <div style={styles.header}>
-        <div style={styles.logo}>EasyGestion</div>
-        <h1 style={styles.welcome}>Bonjour {user?.username || 'Utilisateur'}</h1>
+        <img src="/logo.png" alt="Logo" style={styles.logo} />
+        <h1 style={styles.welcome}>Bonjour {user?.username}</h1>
       </div>
 
       {/* Main Content */}
       <div style={styles.mainContent}>
         {/* Menu Buttons */}
         <div style={styles.menuGrid}>
-          <button style={styles.menuButton}>
+          <button style={styles.menuButton} onClick={() => document.getElementById('packages-section').scrollIntoView()}>
             <div style={styles.buttonIcon}>💇</div>
-            <div style={styles.buttonText}>Choisir un service</div>
+            <div style={styles.buttonText}>Services</div>
           </button>
 
-          <button style={styles.menuButton}>
+          <button style={styles.menuButton} onClick={() => document.getElementById('stats-section').scrollIntoView()}>
             <div style={styles.buttonIcon}>📊</div>
-            <div style={styles.buttonText}>Mes statistiques</div>
+            <div style={styles.buttonText}>Mes Statistiques</div>
           </button>
         </div>
 
+        {/* Stats Section */}
+        <div id="stats-section" style={styles.statsSection}>
+          <h2 style={styles.sectionTitle}>Mes Statistiques</h2>
+          <div style={styles.statsGrid}>
+            <div style={styles.statCard}>
+              <div style={styles.statValue}>€{stats.total_revenue?.toFixed(2) || '0.00'}</div>
+              <div style={styles.statLabel}>Revenus du Mois</div>
+            </div>
+            <div style={styles.statCard}>
+              <div style={styles.statValue}>€{stats.remaining_revenue?.toFixed(2) || '0.00'}</div>
+              <div style={styles.statLabel}>Revenus Restants</div>
+            </div>
+            <div style={styles.statCard}>
+              <div style={styles.statValue}>{stats.deduction_percentage || 0}%</div>
+              <div style={styles.statLabel}>Déduction</div>
+            </div>
+          </div>
+        </div>
+
         {/* Packages Section */}
-        <div style={styles.packagesSection}>
-          <h2 style={styles.sectionTitle}>Services disponibles</h2>
+        <div id="packages-section" style={styles.packagesSection}>
+          <h2 style={styles.sectionTitle}>Sélection de Services</h2>
+
+          {/* Package Selection */}
           <div style={styles.packagesGrid}>
             {packages.map(pkg => (
               <div
                 key={pkg.id}
-                style={styles.packageCard}
+                style={{
+                  ...styles.packageCard,
+                  ...(selectedPackage?.id === pkg.id ? styles.selectedPackage : {})
+                }}
                 onClick={() => handlePackageSelect(pkg)}
               >
                 <div style={styles.packageName}>{pkg.name}</div>
@@ -80,27 +151,79 @@ const UserDashboard = () => {
               </div>
             ))}
           </div>
-        </div>
 
-        {/* Personal Stats */}
-        <div style={styles.statsSection}>
-          <div style={styles.statsCard}>
-            <h3>Mon chiffre d'affaires aujourd'hui</h3>
-            <div style={styles.statsValue}>
-              €{analytics.realtime_turnover?.toFixed(2) || '0.00'}
+          {/* Sale Form */}
+          {selectedPackage && (
+            <form onSubmit={handleSaleSubmit} style={styles.form}>
+              <h3>Enregistrer une Vente</h3>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Service Sélectionné:</label>
+                <div style={styles.selectedService}>
+                  {selectedPackage.name} - €{selectedPackage.price}
+                </div>
+              </div>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Nom du Client:</label>
+                <input
+                  type="text"
+                  value={clientName}
+                  onChange={(e) => setClientName(e.target.value)}
+                  style={styles.input}
+                  required
+                />
+              </div>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Description (optionnel):</label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  style={styles.textarea}
+                />
+              </div>
+              <button type="submit" style={styles.submitButton}>Enregistrer la Vente</button>
+            </form>
+          )}
+
+          {/* Receipt Form */}
+          <form onSubmit={handleReceiptSubmit} style={styles.form}>
+            <h3>Enregistrer un Reçu</h3>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Nom du Client:</label>
+              <input
+                type="text"
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+                style={styles.input}
+                required
+              />
             </div>
-          </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Montant (€):</label>
+              <input
+                type="number"
+                step="0.01"
+                value={receiptAmount}
+                onChange={(e) => setReceiptAmount(e.target.value)}
+                style={styles.input}
+                required
+              />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Description (optionnel):</label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                style={styles.textarea}
+              />
+            </div>
+            <button type="submit" style={styles.submitButton}>Enregistrer le Reçu</button>
+          </form>
         </div>
       </div>
 
-      {/* Logout Button */}
+      {/* Footer */}
       <div style={styles.footer}>
-        <button
-          onClick={handleLogout}
-          style={styles.logoutButton}
-        >
-          Déconnexion
-        </button>
+        <button style={styles.logoutButton} onClick={handleLogout}>Déconnexion</button>
       </div>
     </div>
   );
@@ -124,18 +247,20 @@ const styles = {
     backgroundColor: 'white',
     padding: '20px',
     textAlign: 'center',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '10px'
   },
   logo: {
-    fontSize: '24px',
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: '10px'
+    width: '50px',
+    height: '50px'
   },
   welcome: {
     margin: 0,
     color: '#333',
-    fontSize: '20px'
+    fontSize: '24px'
   },
   mainContent: {
     flex: 1,
@@ -171,7 +296,7 @@ const styles = {
     fontWeight: 'bold',
     color: '#333'
   },
-  packagesSection: {
+  statsSection: {
     marginBottom: '30px'
   },
   sectionTitle: {
@@ -179,45 +304,107 @@ const styles = {
     marginBottom: '15px',
     color: '#333'
   },
+  statsGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gap: '15px'
+  },
+  statCard: {
+    backgroundColor: 'white',
+    borderRadius: '8px',
+    padding: '20px',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    textAlign: 'center'
+  },
+  statValue: {
+    fontSize: '24px',
+    fontWeight: 'bold',
+    color: '#007bff',
+    marginBottom: '5px'
+  },
+  statLabel: {
+    fontSize: '14px',
+    color: '#666'
+  },
+  packagesSection: {
+    marginBottom: '30px'
+  },
   packagesGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-    gap: '15px'
+    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+    gap: '15px',
+    marginBottom: '20px'
   },
   packageCard: {
     backgroundColor: 'white',
+    border: '2px solid #ddd',
     borderRadius: '8px',
-    padding: '20px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    padding: '15px',
+    textAlign: 'center',
     cursor: 'pointer',
-    transition: 'transform 0.2s',
-    textAlign: 'center'
+    transition: 'all 0.3s'
+  },
+  selectedPackage: {
+    borderColor: '#007bff',
+    backgroundColor: '#e7f3ff'
   },
   packageName: {
-    fontSize: '18px',
+    fontSize: '16px',
     fontWeight: 'bold',
-    marginBottom: '10px'
+    marginBottom: '5px'
   },
   packagePrice: {
-    fontSize: '24px',
+    fontSize: '18px',
     color: '#007bff',
     fontWeight: 'bold'
   },
-  statsSection: {
-    marginBottom: '30px'
-  },
-  statsCard: {
+  form: {
     backgroundColor: 'white',
     borderRadius: '8px',
     padding: '20px',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    textAlign: 'center'
+    marginBottom: '20px'
   },
-  statsValue: {
-    fontSize: '32px',
+  formGroup: {
+    marginBottom: '15px'
+  },
+  label: {
+    display: 'block',
+    marginBottom: '5px',
     fontWeight: 'bold',
-    color: '#28a745',
-    marginTop: '10px'
+    color: '#333'
+  },
+  input: {
+    width: '100%',
+    padding: '10px',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+    fontSize: '16px'
+  },
+  textarea: {
+    width: '100%',
+    padding: '10px',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+    fontSize: '16px',
+    minHeight: '80px'
+  },
+  selectedService: {
+    padding: '10px',
+    backgroundColor: '#f8f9fa',
+    borderRadius: '4px',
+    fontWeight: 'bold'
+  },
+  submitButton: {
+    backgroundColor: '#28a745',
+    color: 'white',
+    border: 'none',
+    padding: '12px 24px',
+    borderRadius: '6px',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    transition: 'background-color 0.3s'
   },
   footer: {
     padding: '20px',

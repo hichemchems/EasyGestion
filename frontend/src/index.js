@@ -2,8 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import AdminDashboard from './components/AdminDashboard';
+import CreateEmployee from './components/CreateEmployee';
+import ExpenseManagement from './components/ExpenseManagement';
+import Home from './components/Home';
 import Login from './components/Login';
 import ProtectedRoute from './components/ProtectedRoute';
+import SalaryViewing from './components/SalaryViewing';
 import UserDashboard from './components/UserDashboard';
 import { AuthProvider } from './contexts/AuthContext';
 import './index.css';
@@ -24,6 +28,30 @@ root.render(
             }
           />
           <Route
+            path="/admin/create-employee"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'superAdmin']}>
+                <CreateEmployee />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/expenses"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'superAdmin']}>
+                <ExpenseManagement />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/salaries"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'superAdmin']}>
+                <SalaryViewing />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/dashboard"
             element={
               <ProtectedRoute allowedRoles={['user', 'barber']}>
@@ -31,6 +59,7 @@ root.render(
               </ProtectedRoute>
             }
           />
+          <Route path="/" element={<Home />} />
           <Route path="*" element={<Login />} />
         </Routes>
       </BrowserRouter>
