@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import '../styles/colors.css';
 
@@ -13,11 +13,7 @@ const UserDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({});
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const [packagesRes, statsRes] = await Promise.all([
         axios.get('/api/packages'),
@@ -31,7 +27,11 @@ const UserDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.id]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handlePackageSelect = (pkg) => {
     setSelectedPackage(pkg);

@@ -23,7 +23,16 @@ const io = new Server(server, {
 });
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-eval'"], // Allow eval for development
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+}));
 app.use(cors({
   origin: process.env.FRONTEND_URL || "http://localhost:3000",
   credentials: true

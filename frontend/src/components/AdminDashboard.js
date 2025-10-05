@@ -93,7 +93,12 @@ const AdminDashboard = () => {
     <div style={styles.container}>
       {/* Header */}
       <div style={styles.header}>
-        <h1 style={styles.welcome}>Bonjour {user?.username}</h1>
+        <div style={styles.headerContent}>
+          <button onClick={() => navigate('/')} style={styles.backButton}>
+            Retour à l'accueil
+          </button>
+          <h1 style={styles.welcome}>Bonjour {user?.username}</h1>
+        </div>
       </div>
 
       {/* Main Content */}
@@ -225,8 +230,23 @@ const styles = {
   header: {
     backgroundColor: 'white',
     padding: '20px',
-    textAlign: 'center',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+  },
+  headerContent: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    maxWidth: '1200px',
+    margin: '0 auto'
+  },
+  backButton: {
+    backgroundColor: '#007bff',
+    color: 'white',
+    border: 'none',
+    padding: '10px 20px',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '14px'
   },
   welcome: {
     margin: 0,

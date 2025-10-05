@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
@@ -21,11 +21,22 @@ const Home = () => {
 
   const onDrop = (acceptedFiles) => {
     setLogo(acceptedFiles[0]);
+    setError(''); // Clear any previous error
+  };
+
+  const onDropRejected = (fileRejections) => {
+    const rejection = fileRejections[0];
+    if (rejection.errors[0].code === 'file-invalid-type') {
+      setError('Please select a valid image file.');
+    } else {
+      setError('File upload failed. Please try again.');
+    }
   };
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: 'image/*',
+    onDropRejected,
+    accept: { 'image/*': [] },
     multiple: false
   });
 
@@ -50,8 +61,8 @@ const Home = () => {
       setError('SIRET must be exactly 14 digits');
       return false;
     }
-    if (!/^[\+]?[1-9][\d]{0,15}$/.test(phone)) {
-      setError('Invalid phone number');
+    if (!/^[+]?[0-9][\d]{0,14}$/.test(phone) || phone.length < 10) {
+      setError('Invalid phone number. Please enter a valid phone number (at least 10 digits)');
       return false;
     }
     return true;
@@ -78,7 +89,7 @@ const Home = () => {
     }
 
     try {
-      await axios.post('/api/admins', formData, {
+      await axios.post('/api/v1/admin', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -105,77 +116,89 @@ const Home = () => {
         <p style={styles.subtitle}>Create your admin account to get started</p>
         <form onSubmit={handleSubmit} style={styles.form}>
           <div style={styles.inputGroup}>
-            <label style={styles.label}>Name:</label>
+            <label htmlFor="name" style={styles.label}>Name:</label>
             <input
+              id="name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               style={styles.input}
+              autoComplete="name"
               required
             />
           </div>
 
           <div style={styles.inputGroup}>
-            <label style={styles.label}>Email:</label>
+            <label htmlFor="email" style={styles.label}>Email:</label>
             <input
+              id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               style={styles.input}
+              autoComplete="email"
               required
             />
           </div>
 
           <div style={styles.inputGroup}>
-            <label style={styles.label}>SIRET (14 digits):</label>
+            <label htmlFor="siret" style={styles.label}>SIRET (14 digits):</label>
             <input
+              id="siret"
               type="text"
               value={siret}
               onChange={(e) => setSiret(e.target.value)}
               style={styles.input}
+              autoComplete="off"
               maxLength="14"
               required
             />
           </div>
 
           <div style={styles.inputGroup}>
-            <label style={styles.label}>Phone:</label>
+            <label htmlFor="phone" style={styles.label}>Phone:</label>
             <input
+              id="phone"
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               style={styles.input}
+              autoComplete="tel"
               required
             />
           </div>
 
           <div style={styles.inputGroup}>
-            <label style={styles.label}>Password:</label>
+            <label htmlFor="password" style={styles.label}>Password:</label>
             <input
+              id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               style={styles.input}
+              autoComplete="new-password"
               required
             />
             <small style={styles.hint}>At least 14 characters, with uppercase, lowercase, number, and special character</small>
           </div>
 
           <div style={styles.inputGroup}>
-            <label style={styles.label}>Confirm Password:</label>
+            <label htmlFor="confirmPassword" style={styles.label}>Confirm Password:</label>
             <input
+              id="confirmPassword"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               style={styles.input}
+              autoComplete="new-password"
               required
             />
           </div>
 
           <div style={styles.inputGroup}>
-            <label style={styles.label}>Logo (optional):</label>
+            <label htmlFor="logo" style={styles.label}>Logo (optional):</label>
             <div {...getRootProps()} style={styles.dropzone}>
-              <input {...getInputProps()} />
+              <input id="logo" {...getInputProps()} />
               {logo ? (
                 <p>Selected: {logo.name}</p>
               ) : (
@@ -194,6 +217,9 @@ const Home = () => {
             {loading ? 'Creating Account...' : 'Create Admin Account'}
           </button>
         </form>
+        <p style={styles.loginLink}>
+          Already have an account? <Link to="/login" style={styles.link}>Login here</Link>
+        </p>
       </div>
     </div>
   );
@@ -281,6 +307,15 @@ const styles = {
     marginBottom: '15px',
     textAlign: 'center',
     fontWeight: 'bold'
+  },
+  loginLink: {
+    textAlign: 'center',
+    marginTop: '20px',
+    color: '#666'
+  },
+  link: {
+    color: '#007bff',
+    textDecoration: 'none'
   }
 };
 

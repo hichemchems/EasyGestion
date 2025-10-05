@@ -33,6 +33,18 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING(255),
     allowNull: true
   },
+  siret: {
+    type: DataTypes.STRING(14),
+    allowNull: true
+  },
+  phone: {
+    type: DataTypes.STRING(20),
+    allowNull: true
+  },
+  logo_path: {
+    type: DataTypes.STRING(255),
+    allowNull: true
+  },
   reset_token_expires: {
     type: DataTypes.DATE,
     allowNull: true
