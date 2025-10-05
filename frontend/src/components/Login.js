@@ -40,6 +40,7 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               style={styles.input}
+              autoComplete="email"
               required
             />
           </div>
@@ -51,6 +52,7 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               style={styles.input}
+              autoComplete="current-password"
               required
             />
           </div>

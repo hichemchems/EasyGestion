@@ -123,6 +123,7 @@ const Home = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               style={styles.input}
+              autoComplete="name"
               required
             />
           </div>
@@ -135,6 +136,7 @@ const Home = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               style={styles.input}
+              autoComplete="email"
               required
             />
           </div>
@@ -147,6 +149,7 @@ const Home = () => {
               value={siret}
               onChange={(e) => setSiret(e.target.value)}
               style={styles.input}
+              autoComplete="off"
               maxLength="14"
               required
             />
@@ -160,6 +163,7 @@ const Home = () => {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               style={styles.input}
+              autoComplete="tel"
               required
             />
           </div>
@@ -172,6 +176,7 @@ const Home = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               style={styles.input}
+              autoComplete="new-password"
               required
             />
             <small style={styles.hint}>At least 14 characters, with uppercase, lowercase, number, and special character</small>
@@ -185,6 +190,7 @@ const Home = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               style={styles.input}
+              autoComplete="new-password"
               required
             />
           </div>
