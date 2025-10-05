@@ -488,8 +488,6 @@ router.get('/dashboard/forecast', authenticateToken, authorizeRoles('admin', 'su
   }
 });
 
-module.exports = router;
-
 // Get all salaries (admin only)
 router.get('/salaries', authenticateToken, authorizeRoles('admin', 'superAdmin'), async (req, res) => {
   try {
@@ -598,3 +596,5 @@ router.delete('/salaries/:id', authenticateToken, authorizeRoles('admin', 'super
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+module.exports = router;
