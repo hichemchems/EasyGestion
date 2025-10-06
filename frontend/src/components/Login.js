@@ -31,7 +31,6 @@ const Login = () => {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h2 style={styles.title}>Connexion EasyGestion</h2>
         <form onSubmit={handleSubmit} style={styles.form}>
           <div style={styles.inputGroup}>
             <label style={styles.label}>Email:</label>
@@ -59,6 +58,8 @@ const Login = () => {
 
           {error && <div style={styles.error}>{error}</div>}
 
+          <h2 style={styles.title}>Connexion EasyGestion</h2>
+
           <button
             type="submit"
             disabled={loading}
@@ -69,7 +70,7 @@ const Login = () => {
         </form>
         <div style={styles.backLink}>
           <button onClick={() => navigate('/')} style={styles.backButton}>
-            Retour à la création d'admin
+            Retour à l'accueil
           </button>
         </div>
       </div>

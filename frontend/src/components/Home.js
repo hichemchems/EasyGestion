@@ -88,8 +88,9 @@ const Home = () => {
       formData.append('logo', logo);
     }
 
+    console.log('Sending admin registration request to:', axios.defaults.baseURL + '/admin');
     try {
-      await axios.post('/api/v1/admin', formData, {
+      await axios.post('/admin', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -103,7 +104,11 @@ const Home = () => {
         setError('Registration successful, but login failed. Please try logging in manually.');
       }
     } catch (error) {
-      setError(error.response?.data?.message || 'Registration failed');
+      if (error.response?.data?.errors) {
+        setError(error.response.data.errors.map(err => err.msg).join(', '));
+      } else {
+        setError(error.response?.data?.message || 'Registration failed');
+      }
     } finally {
       setLoading(false);
     }
@@ -179,7 +184,7 @@ const Home = () => {
               autoComplete="new-password"
               required
             />
-            <small style={styles.hint}>At least 14 characters, with uppercase, lowercase, number, and special character</small>
+            <small style={styles.hint}>At least 14 characters, with uppercase, lowercase, number, and one special character (@$!%*?&)</small>
           </div>
 
           <div style={styles.inputGroup}>
