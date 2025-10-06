@@ -43,4 +43,3 @@
 
 ---
 
-Please confirm if you want me to start working on these tasks in the order listed or if you want to prioritize specific items.
