@@ -60,41 +60,55 @@ router.post('/', adminCreationValidation, async (req, res) => {
     console.log('Validation passed');
 
     const { email, siret, phone, password, name } = req.body;
+    console.log('Extracted data:', { email, siret, phone, name, passwordLength: password.length });
 
     // Allow multiple admins for testing
 
+    console.log('Checking for existing user with email or username');
     // Check if user with email or username already exists
     const existingUser = await User.findOne({
       where: { [require('sequelize').Op.or]: [{ email }, { username: name }] }
     });
     if (existingUser) {
+      console.log('Existing user found:', existingUser.email, existingUser.username);
       return res.status(400).json({ message: 'User with this email or username already exists' });
     }
+    console.log('No existing user found');
 
     // Handle logo upload
     let logoPath = null;
     if (req.files && req.files.logo) {
+      console.log('Logo file provided, processing upload');
       const logo = req.files.logo;
 
       // Create uploads/logos directory if it doesn't exist
       const uploadDir = path.join(__dirname, '../uploads/logos');
+      console.log('Upload directory:', uploadDir);
       if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
+        console.log('Created upload directory');
       }
 
       // Generate unique filename
       const fileName = `logo_${Date.now()}_${logo.name}`;
       logoPath = path.join(uploadDir, fileName);
+      console.log('Logo path:', logoPath);
 
       // Move file
       await logo.mv(logoPath);
       logoPath = `/uploads/logos/${fileName}`; // Relative path for database
+      console.log('Logo uploaded successfully, relative path:', logoPath);
+    } else {
+      console.log('No logo file provided');
     }
 
+    console.log('Hashing password');
     // Hash password
     const saltRounds = 8;
     const password_hash = await bcrypt.hash(password, saltRounds);
+    console.log('Password hashed successfully');
 
+    console.log('Creating admin user');
     // Create admin user
     const admin = await User.create({
       username: name, // Use name as username
@@ -105,10 +119,14 @@ router.post('/', adminCreationValidation, async (req, res) => {
       phone,
       logo_path: logoPath
     });
+    console.log('Admin user created successfully, ID:', admin.id);
 
+    console.log('Generating JWT token');
     // Generate token
     const token = generateToken(admin);
+    console.log('Token generated successfully');
 
+    console.log('Setting cookie');
     // Set cookie
     res.cookie('token', token, {
       httpOnly: true,
@@ -116,7 +134,9 @@ router.post('/', adminCreationValidation, async (req, res) => {
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
+    console.log('Cookie set successfully');
 
+    console.log('Sending success response');
     res.status(201).json({
       message: 'Admin created successfully',
       user: {
