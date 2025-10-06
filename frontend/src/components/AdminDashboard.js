@@ -23,12 +23,12 @@ const AdminDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       const [barbersRes, chartsRes, forecastRes, basketRes, clientRes, dailyRes] = await Promise.all([
-        axios.get('/api/admin/dashboard/sorted-barbers'),
-        axios.get('/api/admin/dashboard/realtime-charts'),
-        axios.get('/api/admin/dashboard/forecast'),
-        axios.get('/api/analytics/realtime-average-basket'),
-        axios.get('/api/analytics/realtime-client-count'),
-        axios.get('/api/analytics/realtime-daily-turnover')
+        axios.get('/admin/dashboard/sorted-barbers'),
+        axios.get('/admin/dashboard/realtime-charts'),
+        axios.get('/admin/dashboard/forecast'),
+        axios.get('/analytics/realtime-average-basket'),
+        axios.get('/analytics/realtime-client-count'),
+        axios.get('/analytics/realtime-daily-turnover')
       ]);
 
       setBarbers(barbersRes.data.barbers || []);
@@ -128,12 +128,12 @@ const AdminDashboard = () => {
 
         {/* Menu Buttons */}
         <div style={styles.menuGrid}>
-          <button style={styles.menuButton}>
+          <button style={{...styles.menuButton, backgroundColor: 'black', color: 'aliceblue'}}>
             <div style={styles.buttonIcon}>👥</div>
             <div style={styles.buttonText}>Mes employés</div>
           </button>
 
-          <button style={styles.menuButton}>
+          <button style={styles.menuButton} onClick={() => navigate('/admin/packages')}>
             <div style={styles.buttonIcon}>💇</div>
             <div style={styles.buttonText}>Services</div>
           </button>

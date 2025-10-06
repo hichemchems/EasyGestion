@@ -6,6 +6,7 @@ import CreateEmployee from './components/CreateEmployee';
 import ExpenseManagement from './components/ExpenseManagement';
 import Home from './components/Home';
 import Login from './components/Login';
+import PackageManagement from './components/PackageManagement';
 import ProtectedRoute from './components/ProtectedRoute';
 import SalaryViewing from './components/SalaryViewing';
 import UserDashboard from './components/UserDashboard';
@@ -46,6 +47,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute allowedRoles={['admin', 'superAdmin']}>
         <SalaryViewing />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/packages",
+    element: (
+      <ProtectedRoute allowedRoles={['admin', 'superAdmin']}>
+        <PackageManagement />
       </ProtectedRoute>
     ),
   },
