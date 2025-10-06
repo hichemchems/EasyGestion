@@ -16,8 +16,8 @@ const UserDashboard = () => {
   const fetchData = useCallback(async () => {
     try {
       const [packagesRes, statsRes] = await Promise.all([
-        axios.get('/api/packages'),
-        axios.get(`/api/employees/${user?.id}/remaining-revenue`)
+        axios.get('/packages'),
+        axios.get(`/employees/${user?.id}/remaining-revenue`)
       ]);
 
       setPackages(packagesRes.data.packages || []);
@@ -42,7 +42,7 @@ const UserDashboard = () => {
     if (!selectedPackage || !clientName) return;
 
     try {
-      await axios.post(`/api/employees/${user?.id}/sales`, {
+      await axios.post(`/employees/${user?.id}/sales`, {
         package_id: selectedPackage.id,
         client_name: clientName,
         description
@@ -64,7 +64,7 @@ const UserDashboard = () => {
     if (!receiptAmount || !clientName) return;
 
     try {
-      await axios.post(`/api/employees/${user?.id}/receipts`, {
+      await axios.post(`/employees/${user?.id}/receipts`, {
         client_name: clientName,
         amount: parseFloat(receiptAmount),
         description

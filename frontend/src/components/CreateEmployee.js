@@ -45,7 +45,7 @@ const CreateEmployee = () => {
 
   const documentsDropzone = useDropzone({
     onDrop: onDropDocuments,
-    accept: 'application/pdf',
+    accept: { 'application/pdf': [] },
     multiple: true
   });
 
@@ -96,7 +96,7 @@ const CreateEmployee = () => {
     });
 
     try {
-      await axios.post('/api/users', data, {
+      await axios.post('/admin/employees', data, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

@@ -1,6 +1,6 @@
 const express = require('express');
 const { Op } = require('sequelize');
-const { Sale, Receipt, Expense, Employee, Package } = require('../models');
+const { Sale, Receipt, Expense, Employee, Package, User } = require('../models');
 const { authenticateToken, authorizeRoles } = require('../middleware/auth');
 
 const router = express.Router();
@@ -211,7 +211,7 @@ router.get('/performance', authenticateToken, async (req, res) => {
 
     const employees = await Employee.findAll({
       include: [{
-        model: require('../models').User,
+        model: User,
         as: 'user',
         attributes: ['username', 'email']
       }]

@@ -14,7 +14,7 @@ const Alert = require('./Alert');
 
 // Define associations
 User.hasOne(Employee, { foreignKey: 'user_id', onDelete: 'CASCADE' });
-Employee.belongsTo(User, { foreignKey: 'user_id' });
+Employee.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
 Employee.hasMany(Sale, { foreignKey: 'employee_id', onDelete: 'CASCADE' });
 Sale.belongsTo(Employee, { foreignKey: 'employee_id' });

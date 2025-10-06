@@ -1,22 +1,45 @@
-# TODO List for Fixing MIME Type Errors in Home.js
+# TODO List for EasyGestion Enhancements
 
-- [x] Update react-dropzone accept prop in Home.js to use object format: { 'image/*': [] }
+## 1. Verify and Fix Dashboard Button Routes
+- Check all buttons in AdminDashboard and UserDashboard for correct routing.
+- Fix any broken or missing routes to ensure navigation works as expected.
 
-# TODO List for Fixing 403 Forbidden Error
+## 2. Implement Prestations (Services) Management
+- Create UI in PackageManagement component to allow admins to add, edit, delete prestations.
+- Ensure prestations are customizable and new ones can be created.
+- Connect UI to backend CRUD endpoints for prestations.
 
-- [x] Update API endpoint in Home.js from '/api/admins' to '/api/v1/admin'
-- [x] Update proxy in frontend/package.json to 'http://localhost:3001'
-- [x] Update CORS origin in backend/index.js to 'http://localhost:3001'
+## 3. Enhance Admin Dashboard Metrics
+- Display the following metrics with correct values:
+  - Panier Moyen (Average Basket)
+  - Clients Aujourd'hui (Clients Today)
+  - Chiffre d'Affaires Journalier (Daily Turnover)
+  - Prévision (Forecast)
+  - Total daily salaries paid to barbers (calculated as percentage deducted from prestations)
+- Show €0.00 as default when no data.
 
-# TODO List for Fixing Remaining Console Errors
+## 4. Add Salary Graphs to Admin Dashboard
+- Add a graph at the bottom showing daily salaries for the current month.
+- Add a line chart above showing monthly total salaries over the past 12 months.
+- Enable clicking on a month in the line chart to view detailed salaries of barbers for that month.
 
-- [x] Update index.js to use createBrowserRouter with future flags to suppress React Router warnings
-- [x] Add favicon.ico to frontend/public/ to resolve 403 error
-- [x] Remove favicon reference from manifest.json to stop 403 requests
-- [x] Update CORS in backend to 'http://localhost:3000'
+## 5. Backend Enhancements
+- Implement or verify backend endpoints to provide salary aggregation data for daily and monthly views.
+- Ensure salary calculations consider percentage deductions from prestations.
+- Add endpoints to fetch detailed salary data per barber per month.
 
-# TODO List for Additional Features
+## 6. Testing
+- Thoroughly test all new and existing features:
+  - UI navigation and button routes.
+  - Prestations management CRUD operations.
+  - Dashboard metrics accuracy and updates.
+  - Salary graphs interactivity and data correctness.
+  - Backend API endpoints for salaries and prestations.
+  - Edge cases and error handling.
 
-- [x] Fix admin creation form issue (CORS fixed, should work now)
-- [x] Add back buttons when logged in to return to creation form if wrong route
-- [x] Fix ESLint warnings (unused variables, missing dependencies, unnecessary escapes)
+## 7. Documentation and Code Cleanup
+- Update documentation for new features and API endpoints.
+- Clean up code and remove any deprecated or unused code.
+
+---
+
