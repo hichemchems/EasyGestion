@@ -63,10 +63,12 @@ router.post('/', adminCreationValidation, async (req, res) => {
 
     // Allow multiple admins for testing
 
-    // Check if user with email already exists
-    const existingUser = await User.findOne({ where: { email } });
+    // Check if user with email or username already exists
+    const existingUser = await User.findOne({
+      where: { [require('sequelize').Op.or]: [{ email }, { username: name }] }
+    });
     if (existingUser) {
-      return res.status(400).json({ message: 'User with this email already exists' });
+      return res.status(400).json({ message: 'User with this email or username already exists' });
     }
 
     // Handle logo upload

@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
+    "migrate": "node run-migrations.js",
     "test": "jest"
   },
   "keywords": [],

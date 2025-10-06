@@ -103,7 +103,11 @@ const Home = () => {
         setError('Registration successful, but login failed. Please try logging in manually.');
       }
     } catch (error) {
-      setError(error.response?.data?.message || 'Registration failed');
+      if (error.response?.data?.errors) {
+        setError(error.response.data.errors.map(err => err.msg).join(', '));
+      } else {
+        setError(error.response?.data?.message || 'Registration failed');
+      }
     } finally {
       setLoading(false);
     }
