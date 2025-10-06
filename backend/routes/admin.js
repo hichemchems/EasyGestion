@@ -4,7 +4,8 @@ const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const path = require('path');
 const fs = require('fs');
-const { User, Expense, Salary, Employee, Sale, Receipt, AdminCharge, Op } = require('../models');
+const { Op } = require('sequelize');
+const { User, Expense, Salary, Employee, Sale, Receipt, AdminCharge } = require('../models');
 const { authenticateToken, authorizeRoles } = require('../middleware/auth');
 
 console.log('Admin routes loaded');
@@ -82,6 +83,7 @@ router.post('/', adminCreationValidation, async (req, res) => {
     if (req.files && req.files.logo) {
       const logo = req.files.logo;
       const uploadPath = path.join(__dirname, '../uploads', logo.name);
+      fs.mkdirSync(path.dirname(uploadPath), { recursive: true });
       await logo.mv(uploadPath);
       user.logo_path = uploadPath;
       await user.save();
