@@ -52,9 +52,8 @@ const getDateRange = (period, date = new Date()) => {
 // Validation rules for admin creation
 const adminCreationValidation = [
   body('email').isEmail().withMessage('Please provide a valid email'),
-  body('siret').optional().isLength({ min: 14, max: 14 }).withMessage('SIRET must be exactly 14 digits')
-    .isNumeric().withMessage('SIRET must contain only numbers'),
-  body('phone').optional().isMobilePhone().withMessage('Please provide a valid phone number'),
+  body('siret').optional().isLength({ min: 14, max: 14 }).withMessage('SIRET must be exactly 14 digits'),
+  body('phone').optional(),
   body('password').isLength({ min: 14 }).withMessage('Password must be at least 14 characters')
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
     .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
@@ -98,24 +97,36 @@ const generateToken = (user) => {
 // Create admin endpoint
 router.post('/', adminCreationValidation, async (req, res) => {
   console.log('Admin creation request received');
+  console.log('Request body:', req.body);
+  console.log('Request files:', req.files);
   try {
+    console.log('Validating request');
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Validation errors:', errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
+    console.log('Validation passed');
 
     const { email, siret, phone, password, name } = req.body;
+    console.log('Extracted data:', { email, siret, phone, password: '[HIDDEN]', name });
 
     // Check if user exists
+    console.log('Checking if user exists');
     const existingUser = await User.findOne({ where: { [Op.or]: [{ email }, { username: name }] } });
     if (existingUser) {
+      console.log('User already exists:', existingUser.email);
       return res.status(400).json({ message: 'User with this email or username already exists' });
     }
+    console.log('User does not exist, proceeding');
 
     // Hash password
+    console.log('Hashing password');
     const hashedPassword = await bcrypt.hash(password, 10);
+    console.log('Password hashed');
 
     // Create user
+    console.log('Creating user');
     const user = await User.create({
       username: name,
       email,
@@ -124,6 +135,7 @@ router.post('/', adminCreationValidation, async (req, res) => {
       siret,
       phone
     });
+    console.log('User created:', user.id);
 
     // Handle logo
     if (req.files && req.files.logo) {
