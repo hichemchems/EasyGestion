@@ -73,10 +73,16 @@ const Home = () => {
     setLoading(true);
     setError('');
 
+    console.log('Starting admin registration process');
+    console.log('Form data:', { name, email, siret, phone, password: '[HIDDEN]', confirmPassword: '[HIDDEN]', logo: logo ? logo.name : 'none' });
+
     if (!validateForm()) {
+      console.log('Form validation failed');
       setLoading(false);
       return;
     }
+
+    console.log('Form validation passed');
 
     const formData = new FormData();
     formData.append('name', name);
@@ -88,22 +94,33 @@ const Home = () => {
       formData.append('logo', logo);
     }
 
+    console.log('FormData created:', Array.from(formData.entries()));
+    console.log('Axios baseURL:', axios.defaults.baseURL);
     console.log('Sending admin registration request to:', axios.defaults.baseURL + '/admin');
+
     try {
-      await axios.post('/admin', formData, {
+      console.log('Making axios POST request');
+      const response = await axios.post('/admin', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
+      console.log('Registration response received:', response.data);
 
       // Auto login after registration
+      console.log('Attempting auto-login');
       const loginResult = await login(email, password);
       if (loginResult.success) {
+        console.log('Login successful, navigating to dashboard');
         navigate('/admin/dashboard');
       } else {
+        console.log('Login failed:', loginResult.error);
         setError('Registration successful, but login failed. Please try logging in manually.');
       }
     } catch (error) {
+      console.log('Registration error:', error);
+      console.log('Error response:', error.response);
+      console.log('Error response data:', error.response?.data);
       if (error.response?.data?.errors) {
         setError(error.response.data.errors.map(err => err.msg).join(', '));
       } else {
