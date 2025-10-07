@@ -7,7 +7,9 @@ const setupDatabase = async () => {
   try {
     // Connect to MySQL as root (assuming no password or password from env)
     connection = await mysql.createConnection({
-      host: process.env.DB_HOST || 'localhost',
+      host: process.env.DB_SOCKET ? undefined : (process.env.DB_HOST || 'localhost'),
+      port: process.env.DB_SOCKET ? undefined : (process.env.DB_PORT || 3306),
+      socketPath: process.env.DB_SOCKET,
       user: 'root',
       password: process.env.DB_ROOT_PASSWORD || '', // Set DB_ROOT_PASSWORD in .env if root has password
     });
