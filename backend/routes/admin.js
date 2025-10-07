@@ -52,9 +52,9 @@ const getDateRange = (period, date = new Date()) => {
 // Validation rules for admin creation
 const adminCreationValidation = [
   body('email').isEmail().withMessage('Please provide a valid email'),
-  body('siret').isLength({ min: 14, max: 14 }).withMessage('SIRET must be exactly 14 digits')
+  body('siret').optional().isLength({ min: 14, max: 14 }).withMessage('SIRET must be exactly 14 digits')
     .isNumeric().withMessage('SIRET must contain only numbers'),
-  body('phone').isMobilePhone().withMessage('Please provide a valid phone number'),
+  body('phone').optional().isMobilePhone().withMessage('Please provide a valid phone number'),
   body('password').isLength({ min: 14 }).withMessage('Password must be at least 14 characters')
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
     .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
