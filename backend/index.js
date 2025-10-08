@@ -54,7 +54,7 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // API versioning
-app.use('/api/v1', require('./routes'));
+app.use('/v1', require('./routes'));
 
 // Socket.io
 io.on('connection', (socket) => {
