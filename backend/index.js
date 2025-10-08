@@ -11,7 +11,6 @@ const { Server } = require('socket.io');
 // Database setup
 const { sequelize, testConnection } = require('./config/database');
 const models = require('./models');
-const scheduler = require('./scheduler');
 
 const app = express();
 const server = createServer(app);
@@ -21,6 +20,8 @@ const io = new Server(server, {
     methods: ["GET", "POST"]
   }
 });
+
+const scheduler = require('./scheduler')(io);
 
 // Middleware
 app.use(helmet({
@@ -53,6 +54,9 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
+// Health check
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
+
 // API versioning
 app.use('/api/v1', require('./routes'));
 
@@ -83,16 +87,6 @@ const startServer = async () => {
   try {
     // Test database connection
     await testConnection();
-
-    // Sync database (create tables if they don't exist)
-    await sequelize.sync({ alter: true }); // Set force: true to drop and recreate tables
-    console.log('Database synchronized successfully.');
-
-    // Seed initial data
-    const seedPackages = require('./seeders/packages');
-    const seedUsers = require('./seeders/users');
-    await seedPackages();
-    await seedUsers();
 
     // Start server
     server.listen(PORT, () => {

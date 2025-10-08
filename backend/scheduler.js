@@ -1,7 +1,8 @@
 const cron = require('node-cron');
 const { Goal, Alert, Employee } = require('./models');
 const { Op } = require('sequelize');
-const { io } = require('./index');
+
+const setupScheduler = (io) => {
 
 // Function to send daily alerts at 9 AM
 const sendDailyAlerts = async () => {
@@ -142,7 +143,10 @@ cron.schedule('0 0 1 * *', () => {
   processCarryOver();
 });
 
-module.exports = {
-  sendDailyAlerts,
-  processCarryOver
+  return {
+    sendDailyAlerts,
+    processCarryOver
+  };
 };
+
+module.exports = setupScheduler;
