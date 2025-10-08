@@ -11,7 +11,6 @@ const { Server } = require('socket.io');
 // Database setup
 const { sequelize, testConnection } = require('./config/database');
 const models = require('./models');
-const scheduler = require('./scheduler');
 
 const app = express();
 const server = createServer(app);
@@ -21,6 +20,8 @@ const io = new Server(server, {
     methods: ["GET", "POST"]
   }
 });
+
+const scheduler = require('./scheduler')(io);
 
 // Middleware
 app.use(helmet({

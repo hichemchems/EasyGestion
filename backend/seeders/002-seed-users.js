@@ -6,13 +6,15 @@ module.exports = {
     const passwordHash = await bcrypt.hash('Hichem.naima12', 10);
 
     // Check if users already exist
-    const existingSuperAdmin = await queryInterface.rawSelect('users', {
-      where: { email: 'superadmin@gmail.com' }
-    }, ['id']);
+    const existingSuperAdmin = await queryInterface.sequelize.query('SELECT id FROM users WHERE email = ? LIMIT 1', {
+      replacements: ['superadmin@gmail.com'],
+      type: Sequelize.QueryTypes.SELECT
+    });
 
-    const existingAdmin = await queryInterface.rawSelect('users', {
-      where: { email: 'admin@gmail.com' }
-    }, ['id']);
+    const existingAdmin = await queryInterface.sequelize.query('SELECT id FROM users WHERE email = ? LIMIT 1', {
+      replacements: ['admin@gmail.com'],
+      type: Sequelize.QueryTypes.SELECT
+    });
 
     const usersToInsert = [];
 
