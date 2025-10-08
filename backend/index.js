@@ -57,7 +57,7 @@ app.use('/api/', limiter);
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 // API versioning
-app.use('/v1', require('./routes'));
+app.use('/api/v1', require('./routes'));
 
 // Socket.io
 io.on('connection', (socket) => {
