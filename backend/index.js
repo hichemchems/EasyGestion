@@ -53,6 +53,9 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
+// Health check
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
+
 // API versioning
 app.use('/v1', require('./routes'));
 
