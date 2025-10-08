@@ -5,8 +5,9 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "setup-db": "node setup-db.js",
-    "migrate": "node run-migrations.js",
+    "db:migrate": "sequelize-cli db:migrate",
+    "db:seed:all": "sequelize-cli db:seed:all",
+    "db:seed:undo:all": "sequelize-cli db:seed:undo:all",
     "test": "jest"
   },
   "keywords": [],
@@ -40,6 +41,7 @@
   "devDependencies": {
     "jest": "^29.7.0",
     "nodemon": "^3.1.10",
+    "sequelize-cli": "^6.6.2",
     "supertest": "^7.1.4"
   }
 }
