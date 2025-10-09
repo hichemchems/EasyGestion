@@ -1,8 +1,8 @@
 # Thorough Testing Plan for EasyGestion App
 
 ## 1. Verify Docker Setup
-- [ ] Check if all containers are running (backend, frontend, db)
-- [ ] Confirm port mappings (backend:5001, frontend:3000)
+- [x] Check if all containers are running (backend, frontend, db)
+- [x] Confirm port mappings (backend:5001, frontend:3000)
 - [ ] Check container logs for errors
 
 ## 2. Backend API Testing (using curl)
@@ -37,3 +37,14 @@
 ## 5. Report Findings and Fixes
 - [ ] Document any bugs or issues found
 - [ ] Suggest fixes if needed
+
+## 6. Deployment and Setup Tasks
+- [x] Update start.sh to:
+  - Start Docker if not running
+  - Install backend dependencies (npm install)
+  - Install frontend dependencies (npm install)
+  - Run database migrations
+  - Start Docker containers (backend, frontend, db)
+- [x] Verify all ports used and declared correctly in docker-compose.yml and code
+- [x] Verify backend methods, syntax, and implementation correctness
+- [x] Verify admin and user creation for account/profile setup

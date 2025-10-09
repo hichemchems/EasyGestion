@@ -112,7 +112,7 @@ const Home = () => {
       const loginResult = await login(email, password);
       if (loginResult.success) {
         console.log('Login successful, navigating to dashboard');
-        navigate('/admin/dashboard');
+        navigate('/admin-dashboard');
       } else {
         console.log('Login failed:', loginResult.error);
         setError('Registration successful, but login failed. Please try logging in manually.');
