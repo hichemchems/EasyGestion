@@ -29,6 +29,11 @@ console.log('salaries loaded');
 router.use('/goals', require('./goals'));
 console.log('goals loaded');
 
+// Health check route
+router.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
+
 // Example route
 router.get('/', (req, res) => {
   console.log('API v1 root route called');

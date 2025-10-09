@@ -6,6 +6,11 @@ import Login from './components/Login';
 import AdminDashboard from './components/AdminDashboard';
 import UserDashboard from './components/UserDashboard';
 import Home from './components/Home';
+import PackageManagement from './components/PackageManagement';
+import ExpenseManagement from './components/ExpenseManagement';
+import CreateEmployee from './components/CreateEmployee';
+import SalaryViewing from './components/SalaryViewing';
+import ReceiptEntry from './components/ReceiptEntry';
 
 function App() {
   return (
@@ -36,6 +41,46 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['user']}>
                   <UserDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/packages"
+              element={
+                <ProtectedRoute allowedRoles={['admin', 'superAdmin']}>
+                  <PackageManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/expenses"
+              element={
+                <ProtectedRoute allowedRoles={['admin', 'superAdmin']}>
+                  <ExpenseManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/create-employee"
+              element={
+                <ProtectedRoute allowedRoles={['admin', 'superAdmin']}>
+                  <CreateEmployee />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/salaries"
+              element={
+                <ProtectedRoute allowedRoles={['admin', 'superAdmin']}>
+                  <SalaryViewing />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/receipts"
+              element={
+                <ProtectedRoute allowedRoles={['admin', 'superAdmin']}>
+                  <ReceiptEntry />
                 </ProtectedRoute>
               }
             />

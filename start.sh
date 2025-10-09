@@ -27,15 +27,6 @@ fi
 echo "Installing backend dependencies..."
 cd backend
 npm install
-
-# Run database migrations
-echo "Running database migrations..."
-npx sequelize-cli db:migrate
-
-# Run database seeders
-echo "Running database seeders..."
-npx sequelize-cli db:seed:all
-
 cd ..
 
 # Install frontend dependencies
@@ -47,6 +38,26 @@ cd ..
 # Start Docker containers
 echo "Starting Docker containers..."
 docker-compose up -d
+
+# Wait for database and backend to be ready
+echo "Waiting for services to be ready..."
+sleep 15
+
+# Check if backend is healthy
+echo "Checking backend health..."
+until docker-compose exec -T backend curl -f http://localhost:5000/health > /dev/null 2>&1; do
+  echo "Backend not ready, waiting..."
+  sleep 5
+done
+echo "Backend is healthy."
+
+# Run database migrations
+echo "Running database migrations..."
+docker-compose exec -T backend npx sequelize-cli db:migrate
+
+# Run database seeders
+echo "Running database seeders..."
+docker-compose exec -T backend npx sequelize-cli db:seed:all
 
 echo "Project started successfully!"
 echo "Frontend: http://localhost:3000"

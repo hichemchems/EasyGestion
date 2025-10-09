@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    const passwordHash = await bcrypt.hash('Hichem.naima12158(&!)', 10);
+    const passwordHash = await bcrypt.hash('admin', 10);
 
     // Check if users already exist
     const existingSuperAdmin = await queryInterface.sequelize.query('SELECT id FROM users WHERE email = ? LIMIT 1', {
