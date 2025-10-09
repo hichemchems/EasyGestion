@@ -7,11 +7,13 @@ async function seedUsers() {
     await sequelize.authenticate();
     console.log('Database connected');
 
-    const passwordHash = await bcrypt.hash('admin', 12);
+    const passwordHash = await bcrypt.hash('Admin123456789!', 12);
 
     // Delete existing
     await User.destroy({ where: { email: 'superadmin@gmail.com' } });
     await User.destroy({ where: { email: 'admin@gmail.com' } });
+    await User.destroy({ where: { username: 'superadmin' } });
+    await User.destroy({ where: { username: 'admin' } });
 
     // Create users
     await User.create({

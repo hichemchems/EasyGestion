@@ -1,19 +1,29 @@
-# TODO: Fix Login and Routing Issues
+# EasyGestion TODO List
 
-## Plan Steps
-1. Verify that the frontend login correctly calls the backend /auth/login and handles the response.
-2. Ensure the JWT token is stored and used for authenticated requests.
-3. Confirm the frontend routing redirects users to the correct dashboard based on their role after login.
-4. Check the ProtectedRoute component to handle unauthorized access and redirect properly.
-5. Investigate the "Route not found" message source—whether from backend API or frontend route.
-6. Optionally, add a frontend route for /unauthorized to handle unauthorized access gracefully.
-7. Test the full login and navigation flow to reproduce and fix any issues.
+## Database Setup
+- [x] Switch to SQLite for local development (Docker issues)
+- [x] Fix migrations for SQLite compatibility (remove MySQL-specific syntax)
+- [x] Run database migrations
+- [x] Seed admin and superadmin users
 
-## Progress
-- [x] Step 1: Verify frontend login API call - Correctly implemented
-- [x] Step 2: Ensure JWT token handling - Correctly implemented
-- [x] Step 3: Confirm role-based routing after login - Correctly implemented
-- [x] Step 4: Check ProtectedRoute redirects - Correctly implemented
-- [x] Step 5: Investigate "Route not found" source - Caused by missing /unauthorized route
-- [x] Step 6: Add /unauthorized route if needed - Added Unauthorized component and route
-- [x] Step 7: Test login and navigation flow - Frontend compiled successfully with only minor warnings
+## Backend Configuration
+- [x] Update config.json for SQLite
+- [x] Update database.js for SQLite
+- [x] Fix proxy target to backend port 5001
+- [x] Verify backend routes (/auth/login, /admin) are working
+
+## Frontend Fixes
+- [x] Modify AuthContext to return user data on login
+- [x] Update Login component to redirect based on user role
+- [x] Keep Home registration navigation as is
+
+## Testing
+- [x] Test login with admin@gmail.com (password: Admin123456789!)
+- [x] Verify redirection to /admin-dashboard for admin role
+- [ ] Test admin registration flow
+- [ ] Test frontend-backend communication via proxy
+
+## Next Steps
+- [ ] If issues persist, check backend logs for errors
+- [ ] Ensure frontend is running on port 3001
+- [ ] Verify proxy middleware is correctly configured

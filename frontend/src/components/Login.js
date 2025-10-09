@@ -23,7 +23,8 @@ const Login = () => {
     console.log('Login result:', result);
 
     if (result.success) {
-      navigate('/dashboard');
+      const role = result.user.role;
+      navigate(role === 'admin' || role === 'superAdmin' ? '/admin-dashboard' : '/user-dashboard');
     } else {
       setError(result.error);
     }
