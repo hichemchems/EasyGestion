@@ -4,7 +4,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
-const fileUpload = require('express-fileupload');
+const multer = require('multer');
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 
@@ -38,11 +38,11 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || "http://localhost:3000",
   credentials: true
 }));
-app.use(fileUpload({
+const upload = multer({
+  dest: 'uploads/',
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
-  abortOnLimit: true,
-  createParentPath: true
-}));
+});
+app.use(upload.any());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
