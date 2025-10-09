@@ -93,6 +93,7 @@ router.post('/register', registerValidation, async (req, res) => {
 // Login endpoint
 router.post('/login', loginValidation, async (req, res) => {
   try {
+    console.log('Login request received for email:', req.body.email);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -102,12 +103,14 @@ router.post('/login', loginValidation, async (req, res) => {
 
     // Find user
     const user = await User.findOne({ where: { email } });
+    console.log('User found:', user ? 'yes' : 'no');
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     // Check password
     const isValidPassword = await bcrypt.compare(password, user.password_hash);
+    console.log('Password valid:', isValidPassword);
     if (!isValidPassword) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }

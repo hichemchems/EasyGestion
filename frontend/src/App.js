@@ -11,6 +11,7 @@ import ExpenseManagement from './components/ExpenseManagement';
 import CreateEmployee from './components/CreateEmployee';
 import SalaryViewing from './components/SalaryViewing';
 import ReceiptEntry from './components/ReceiptEntry';
+import Unauthorized from './components/Unauthorized';
 
 function App() {
   return (
@@ -84,6 +85,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="*" element={<div>Page not found</div>} />
           </Routes>
         </div>

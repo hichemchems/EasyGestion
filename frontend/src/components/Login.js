@@ -16,8 +16,11 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    console.log('Login form submitted with:', { email, password });
 
     const result = await login(email, password);
+
+    console.log('Login result:', result);
 
     if (result.success) {
       navigate('/dashboard');
