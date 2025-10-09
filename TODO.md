@@ -1,50 +1,29 @@
-# Thorough Testing Plan for EasyGestion App
+# EasyGestion TODO List
 
-## 1. Verify Docker Setup
-- [x] Check if all containers are running (backend, frontend, db)
-- [x] Confirm port mappings (backend:5001, frontend:3000)
-- [ ] Check container logs for errors
+## Database Setup
+- [x] Switch to SQLite for local development (Docker issues)
+- [x] Fix migrations for SQLite compatibility (remove MySQL-specific syntax)
+- [x] Run database migrations
+- [x] Seed admin and superadmin users
 
-## 2. Backend API Testing (using curl)
-- [ ] Auth endpoints: POST /api/v1/auth/login (test with seeded users)
-- [ ] Admin endpoints: POST /api/v1/admin (create admin with multipart/form-data), GET /api/v1/admin (list), etc.
-- [ ] Users endpoints: CRUD operations
-- [ ] Employees endpoints: CRUD operations (with file uploads)
-- [ ] Packages endpoints: CRUD operations
-- [ ] Sales/Receipts endpoints: CRUD operations
-- [ ] Expenses endpoints: CRUD operations
-- [ ] Salaries endpoints: CRUD operations
-- [ ] Analytics endpoints: Turnover, sales data
-- [ ] Goals endpoints: CRUD operations
-- [ ] Alerts endpoints: CRUD operations
-- [ ] AdminCharges endpoints: CRUD operations
-- [ ] Edge cases: Invalid data, missing fields, unauthorized access, file upload failures
+## Backend Configuration
+- [x] Update config.json for SQLite
+- [x] Update database.js for SQLite
+- [x] Fix proxy target to backend port 5001
+- [x] Verify backend routes (/auth/login, /admin) are working
 
-## 3. Frontend UI Testing (using browser)
-- [ ] Launch browser at localhost:3000
-- [ ] Test login page with seeded credentials
-- [ ] Test admin dashboard: View analytics, create admin form
-- [ ] Test user dashboard: View data
-- [ ] Test forms: Create employee (with file), package, expense, receipt, salary
-- [ ] Test navigation and data display
-- [ ] Edge cases: Invalid inputs, error messages
+## Frontend Fixes
+- [x] Modify AuthContext to return user data on login
+- [x] Update Login component to redirect based on user role
+- [x] Keep Home registration navigation as is
 
-## 4. Database and Integration Testing
-- [ ] Verify seeded users exist (superadmin, admin)
-- [ ] Check data integrity after API calls
-- [ ] Ensure frontend-backend integration (data flows correctly)
+## Testing
+- [x] Test login with admin@gmail.com (password: Admin123456789!)
+- [x] Verify redirection to /admin-dashboard for admin role
+- [ ] Test admin registration flow
+- [ ] Test frontend-backend communication via proxy
 
-## 5. Report Findings and Fixes
-- [ ] Document any bugs or issues found
-- [ ] Suggest fixes if needed
-
-## 6. Deployment and Setup Tasks
-- [x] Update start.sh to:
-  - Start Docker if not running
-  - Install backend dependencies (npm install)
-  - Install frontend dependencies (npm install)
-  - Run database migrations
-  - Start Docker containers (backend, frontend, db)
-- [x] Verify all ports used and declared correctly in docker-compose.yml and code
-- [x] Verify backend methods, syntax, and implementation correctness
-- [x] Verify admin and user creation for account/profile setup
+## Next Steps
+- [ ] If issues persist, check backend logs for errors
+- [ ] Ensure frontend is running on port 3001
+- [ ] Verify proxy middleware is correctly configured

@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const { body, validationResult } = require('express-validator');
+const { Op } = require('sequelize');
 const { User } = require('../models');
 
 const router = express.Router();
@@ -44,7 +45,7 @@ router.post('/register', registerValidation, async (req, res) => {
 
     // Check if user already exists
     const existingUser = await User.findOne({
-      where: { [require('sequelize').Op.or]: [{ email }, { username }] }
+      where: { [Op.or]: [{ email }, { username }] }
     });
 
     if (existingUser) {
@@ -92,6 +93,7 @@ router.post('/register', registerValidation, async (req, res) => {
 // Login endpoint
 router.post('/login', loginValidation, async (req, res) => {
   try {
+    console.log('Login request received for email:', req.body.email);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -101,12 +103,14 @@ router.post('/login', loginValidation, async (req, res) => {
 
     // Find user
     const user = await User.findOne({ where: { email } });
+    console.log('User found:', user ? 'yes' : 'no');
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     // Check password
     const isValidPassword = await bcrypt.compare(password, user.password_hash);
+    console.log('Password valid:', isValidPassword);
     if (!isValidPassword) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -257,7 +261,7 @@ router.post('/password-reset', [
     const user = await User.findOne({
       where: {
         reset_token: token,
-        reset_token_expires: { [require('sequelize').Op.gt]: Date.now() }
+        reset_token_expires: { [Op.gt]: Date.now() }
       }
     });
 

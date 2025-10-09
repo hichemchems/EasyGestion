@@ -4,7 +4,8 @@ const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const path = require('path');
 const fs = require('fs');
-const { User, Employee } = require('../models');
+const { Op } = require('sequelize');
+const { User, Employee, Receipt } = require('../models');
 const { authenticateToken, authorizeRoles } = require('../middleware/auth');
 
 const router = express.Router();
@@ -259,7 +260,7 @@ router.get('/dashboard/sorted-barbers', authenticateToken, authorizeRoles('admin
       const dailyReceipts = await Receipt.sum('amount', {
         where: {
           employee_id: employee.id,
-          date: { [require('sequelize').Op.between]: [startOfDay, endOfDay] }
+          date: { [Op.between]: [startOfDay, endOfDay] }
         }
       }) || 0;
 
@@ -276,7 +277,7 @@ router.get('/dashboard/sorted-barbers', authenticateToken, authorizeRoles('admin
       const weeklyReceipts = await Receipt.sum('amount', {
         where: {
           employee_id: employee.id,
-          date: { [require('sequelize').Op.between]: [startOfWeek, endOfWeek] }
+          date: { [Op.between]: [startOfWeek, endOfWeek] }
         }
       }) || 0;
 
@@ -287,7 +288,7 @@ router.get('/dashboard/sorted-barbers', authenticateToken, authorizeRoles('admin
       const monthlyReceipts = await Receipt.sum('amount', {
         where: {
           employee_id: employee.id,
-          date: { [require('sequelize').Op.between]: [startOfMonth, endOfMonth] }
+          date: { [Op.between]: [startOfMonth, endOfMonth] }
         }
       }) || 0;
 
@@ -331,7 +332,7 @@ router.get('/dashboard/realtime-charts', authenticateToken, authorizeRoles('admi
 
       const turnover = await Receipt.sum('amount', {
         where: {
-          date: { [require('sequelize').Op.between]: [startOfDay, endOfDay] }
+          date: { [Op.between]: [startOfDay, endOfDay] }
         }
       }) || 0;
 
@@ -351,7 +352,7 @@ router.get('/dashboard/realtime-charts', authenticateToken, authorizeRoles('admi
 
       const turnover = await Receipt.sum('amount', {
         where: {
-          date: { [require('sequelize').Op.between]: [startOfMonth, endOfMonth] }
+          date: { [Op.between]: [startOfMonth, endOfMonth] }
         }
       }) || 0;
 
@@ -370,7 +371,7 @@ router.get('/dashboard/realtime-charts', authenticateToken, authorizeRoles('admi
 
       const turnover = await Receipt.sum('amount', {
         where: {
-          date: { [require('sequelize').Op.between]: [startOfYear, endOfYear] }
+          date: { [Op.between]: [startOfYear, endOfYear] }
         }
       }) || 0;
 
@@ -401,7 +402,7 @@ router.get('/dashboard/forecast', authenticateToken, authorizeRoles('admin', 'su
 
     const ytdTurnover = await Receipt.sum('amount', {
       where: {
-        date: { [require('sequelize').Op.between]: [startOfYear, now] }
+        date: { [Op.between]: [startOfYear, now] }
       }
     }) || 0;
 
@@ -413,105 +414,6 @@ router.get('/dashboard/forecast', authenticateToken, authorizeRoles('admin', 'su
       ytd_turnover: parseFloat(ytdTurnover),
       annual_objective: annualObjective,
       percentage_achieved: percentageAchieved
-    });
-  } catch (error) {
-    console.error('Get forecast error:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
-
-// Get sorted barbers (employees) for dashboard
-router.get('/dashboard/sorted-barbers', authenticateToken, authorizeRoles('admin', 'superAdmin'), async (req, res) => {
-  try {
-    const employees = await Employee.findAll({
-      include: [{
-        model: User,
-        as: 'user',
-        attributes: ['username', 'email']
-      }],
-      order: [['name', 'ASC']]
-    });
-
-    // Add mock data for receipts (since no real data yet)
-    const barbersWithStats = employees.map(employee => ({
-      id: employee.id,
-      name: employee.name,
-      daily_receipts: 0,
-      weekly_receipts: 0,
-      monthly_receipts: 0,
-      turnover: 0,
-      deduction_percentage: employee.deduction_percentage
-    }));
-
-    res.json({
-      message: 'Sorted barbers retrieved successfully',
-      barbers: barbersWithStats
-    });
-  } catch (error) {
-    console.error('Get sorted barbers error:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
-
-// Get realtime charts data
-router.get('/dashboard/realtime-charts', authenticateToken, authorizeRoles('admin', 'superAdmin'), async (req, res) => {
-  try {
-    // Mock data for now - in real implementation, fetch from database
-    const daily = [];
-    const monthly = [];
-    const yearly = [];
-
-    // Generate last 7 days
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      daily.push({
-        date: date.toISOString().split('T')[0],
-        turnover: Math.random() * 500 + 100
-      });
-    }
-
-    // Generate last 12 months
-    for (let i = 11; i >= 0; i--) {
-      const date = new Date();
-      date.setMonth(date.getMonth() - i);
-      monthly.push({
-        month: date.toISOString().slice(0, 7),
-        turnover: Math.random() * 5000 + 1000
-      });
-    }
-
-    // Generate last 5 years
-    for (let i = 4; i >= 0; i--) {
-      const year = new Date().getFullYear() - i;
-      yearly.push({
-        year: year.toString(),
-        turnover: Math.random() * 50000 + 10000
-      });
-    }
-
-    res.json({
-      message: 'Realtime charts data retrieved successfully',
-      daily,
-      monthly,
-      yearly
-    });
-  } catch (error) {
-    console.error('Get realtime charts error:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
-
-// Get forecast data
-router.get('/dashboard/forecast', authenticateToken, authorizeRoles('admin', 'superAdmin'), async (req, res) => {
-  try {
-    // Mock forecast data
-    const percentageAchieved = Math.random() * 100;
-
-    res.json({
-      message: 'Forecast data retrieved successfully',
-      percentage_achieved: percentageAchieved,
-      status: percentageAchieved > 50 ? 'on_track' : 'behind'
     });
   } catch (error) {
     console.error('Get forecast error:', error);

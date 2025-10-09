@@ -46,5 +46,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "react-router": {
+    "v7_startTransition": true
   }
 }

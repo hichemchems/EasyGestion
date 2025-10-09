@@ -1,26 +1,14 @@
 {
   "development": {
-    "username": "easygestionuser",
-    "password": "easygestionpass",
-    "database": "easygestion",
-    "host": "db",
-    "port": 3306,
-    "dialect": "mysql"
+    "dialect": "sqlite",
+    "storage": "./db/database.sqlite"
   },
   "test": {
-    "username": "easygestionuser",
-    "password": "easygestionpass",
-    "database": "easygestion_test",
-    "host": "db",
-    "port": 3306,
-    "dialect": "mysql"
+    "dialect": "sqlite",
+    "storage": "./db/test.sqlite"
   },
   "production": {
-    "username": "easygestionuser",
-    "password": "easygestionpass",
-    "database": "easygestion",
-    "host": "db",
-    "port": 3306,
-    "dialect": "mysql"
+    "dialect": "sqlite",
+    "storage": "./db/production.sqlite"
   }
 }
