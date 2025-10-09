@@ -27,6 +27,15 @@ fi
 echo "Installing backend dependencies..."
 cd backend
 npm install
+
+# Run database migrations
+echo "Running database migrations..."
+npx sequelize-cli db:migrate
+
+# Run database seeders
+echo "Running database seeders..."
+npx sequelize-cli db:seed:all
+
 cd ..
 
 # Install frontend dependencies
