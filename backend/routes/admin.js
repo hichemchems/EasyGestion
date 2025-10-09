@@ -229,4 +229,189 @@ router.post('/employees', employeeCreateValidation, async (req, res) => {
   }
 });
 
+// Get sorted barbers for dashboard
+router.get('/dashboard/sorted-barbers', authenticateToken, authorizeRoles('admin', 'superAdmin'), async (req, res) => {
+  try {
+    const employees = await Employee.findAll({
+      include: [{
+        model: User,
+        as: 'user',
+        attributes: ['username', 'email']
+      }],
+      order: [['name', 'ASC']]
+    });
+
+    // Calculate turnover for each employee (simplified - you may want to add actual calculations)
+    const barbersWithTurnover = await Promise.all(employees.map(async (employee) => {
+      // Get today's receipts
+      const today = new Date();
+      const startOfDay = new Date(today);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(today);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      const dailyReceipts = await Receipt.sum('amount', {
+        where: {
+          employee_id: employee.id,
+          date: { [require('sequelize').Op.between]: [startOfDay, endOfDay] }
+        }
+      }) || 0;
+
+      // Get this week's receipts
+      const startOfWeek = new Date(today);
+      const day = startOfWeek.getDay();
+      const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
+      startOfWeek.setDate(diff);
+      startOfWeek.setHours(0, 0, 0, 0);
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 6);
+      endOfWeek.setHours(23, 59, 59, 999);
+
+      const weeklyReceipts = await Receipt.sum('amount', {
+        where: {
+          employee_id: employee.id,
+          date: { [require('sequelize').Op.between]: [startOfWeek, endOfWeek] }
+        }
+      }) || 0;
+
+      // Get this month's receipts
+      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999);
+
+      const monthlyReceipts = await Receipt.sum('amount', {
+        where: {
+          employee_id: employee.id,
+          date: { [require('sequelize').Op.between]: [startOfMonth, endOfMonth] }
+        }
+      }) || 0;
+
+      // Calculate turnover (assuming turnover = receipts for simplicity)
+      const turnover = monthlyReceipts;
+
+      return {
+        id: employee.id,
+        name: employee.name,
+        position: employee.position,
+        deduction_percentage: employee.deduction_percentage,
+        daily_receipts: parseFloat(dailyReceipts),
+        weekly_receipts: parseFloat(weeklyReceipts),
+        monthly_receipts: parseFloat(monthlyReceipts),
+        turnover: parseFloat(turnover)
+      };
+    }));
+
+    res.json({
+      message: 'Barbers retrieved successfully',
+      barbers: barbersWithTurnover
+    });
+  } catch (error) {
+    console.error('Get sorted barbers error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Get realtime charts data
+router.get('/dashboard/realtime-charts', authenticateToken, authorizeRoles('admin', 'superAdmin'), async (req, res) => {
+  try {
+    // Get last 7 days data
+    const daily = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      const turnover = await Receipt.sum('amount', {
+        where: {
+          date: { [require('sequelize').Op.between]: [startOfDay, endOfDay] }
+        }
+      }) || 0;
+
+      daily.push({
+        date: date.toISOString().split('T')[0],
+        turnover: parseFloat(turnover)
+      });
+    }
+
+    // Get last 12 months data
+    const monthly = [];
+    for (let i = 11; i >= 0; i--) {
+      const date = new Date();
+      date.setMonth(date.getMonth() - i);
+      const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+      const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
+
+      const turnover = await Receipt.sum('amount', {
+        where: {
+          date: { [require('sequelize').Op.between]: [startOfMonth, endOfMonth] }
+        }
+      }) || 0;
+
+      monthly.push({
+        month: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`,
+        turnover: parseFloat(turnover)
+      });
+    }
+
+    // Get last 5 years data
+    const yearly = [];
+    for (let i = 4; i >= 0; i--) {
+      const year = new Date().getFullYear() - i;
+      const startOfYear = new Date(year, 0, 1);
+      const endOfYear = new Date(year, 11, 31, 23, 59, 59, 999);
+
+      const turnover = await Receipt.sum('amount', {
+        where: {
+          date: { [require('sequelize').Op.between]: [startOfYear, endOfYear] }
+        }
+      }) || 0;
+
+      yearly.push({
+        year: year.toString(),
+        turnover: parseFloat(turnover)
+      });
+    }
+
+    res.json({
+      message: 'Realtime charts data retrieved successfully',
+      daily,
+      monthly,
+      yearly
+    });
+  } catch (error) {
+    console.error('Get realtime charts error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Get forecast data
+router.get('/dashboard/forecast', authenticateToken, authorizeRoles('admin', 'superAdmin'), async (req, res) => {
+  try {
+    const currentYear = new Date().getFullYear();
+    const startOfYear = new Date(currentYear, 0, 1);
+    const now = new Date();
+
+    const ytdTurnover = await Receipt.sum('amount', {
+      where: {
+        date: { [require('sequelize').Op.between]: [startOfYear, now] }
+      }
+    }) || 0;
+
+    const annualObjective = 50000; // You can make this configurable
+    const percentageAchieved = (parseFloat(ytdTurnover) / annualObjective) * 100;
+
+    res.json({
+      message: 'Forecast data retrieved successfully',
+      ytd_turnover: parseFloat(ytdTurnover),
+      annual_objective: annualObjective,
+      percentage_achieved: percentageAchieved
+    });
+  } catch (error) {
+    console.error('Get forecast error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 module.exports = router;

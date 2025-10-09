@@ -26,6 +26,8 @@ router.use('/analytics', require('./analytics'));
 console.log('analytics loaded');
 router.use('/salaries', require('./salaries'));
 console.log('salaries loaded');
+router.use('/goals', require('./goals'));
+console.log('goals loaded');
 
 // Example route
 router.get('/', (req, res) => {
