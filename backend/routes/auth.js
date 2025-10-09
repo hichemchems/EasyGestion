@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const { body, validationResult } = require('express-validator');
+const { Op } = require('sequelize');
 const { User } = require('../models');
 
 const router = express.Router();
@@ -44,7 +45,7 @@ router.post('/register', registerValidation, async (req, res) => {
 
     // Check if user already exists
     const existingUser = await User.findOne({
-      where: { [require('sequelize').Op.or]: [{ email }, { username }] }
+      where: { [Op.or]: [{ email }, { username }] }
     });
 
     if (existingUser) {
@@ -257,7 +258,7 @@ router.post('/password-reset', [
     const user = await User.findOne({
       where: {
         reset_token: token,
-        reset_token_expires: { [require('sequelize').Op.gt]: Date.now() }
+        reset_token_expires: { [Op.gt]: Date.now() }
       }
     });
 

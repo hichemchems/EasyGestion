@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    const passwordHash = await bcrypt.hash('admin', 10);
+    const passwordHash = await bcrypt.hash('Admin123456789!', 12);
 
     // Check if users already exist
     const existingSuperAdmin = await queryInterface.sequelize.query('SELECT id FROM users WHERE email = ? LIMIT 1', {
@@ -16,33 +16,30 @@ module.exports = {
       type: Sequelize.QueryTypes.SELECT
     });
 
-    const usersToInsert = [];
+    // Delete existing users to ensure clean state
+    await queryInterface.bulkDelete('users', { email: 'superadmin@gmail.com' }, {});
+    await queryInterface.bulkDelete('users', { email: 'admin@gmail.com' }, {});
 
-    if (!existingSuperAdmin) {
-      usersToInsert.push({
+    const usersToInsert = [
+      {
         username: 'superadmin',
         email: 'superadmin@gmail.com',
         password_hash: passwordHash,
         role: 'superAdmin',
         created_at: new Date(),
         updated_at: new Date()
-      });
-    }
-
-    if (!existingAdmin) {
-      usersToInsert.push({
+      },
+      {
         username: 'admin',
         email: 'admin@gmail.com',
         password_hash: passwordHash,
         role: 'admin',
         created_at: new Date(),
         updated_at: new Date()
-      });
-    }
+      }
+    ];
 
-    if (usersToInsert.length > 0) {
-      await queryInterface.bulkInsert('users', usersToInsert, {});
-    }
+    await queryInterface.bulkInsert('users', usersToInsert, {});
   },
 
   down: async (queryInterface, Sequelize) => {
