@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import '../styles/colors.css';
@@ -8,29 +8,38 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loginAttempted, setLoginAttempted] = useState(false);
 
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setLoginAttempted(true);
     console.log('Login form submitted with:', { email, password });
 
     const result = await login(email, password);
 
     console.log('Login result:', result);
 
-    if (result.success) {
-      const role = result.user.role;
-      navigate(role === 'admin' || role === 'superAdmin' ? '/admin-dashboard' : '/user-dashboard');
-    } else {
+    if (!result.success) {
       setError(result.error);
+      setLoginAttempted(false);
     }
 
     setLoading(false);
   };
+
+  // Navigate after successful login when user state is updated
+  useEffect(() => {
+    if (loginAttempted && user) {
+      const role = user.role;
+      navigate(role === 'admin' || role === 'superAdmin' ? '/admin-dashboard' : '/user-dashboard', { replace: true });
+      setLoginAttempted(false);
+    }
+  }, [user, loginAttempted, navigate]);
 
   return (
     <div style={styles.container}>
