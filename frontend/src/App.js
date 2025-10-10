@@ -16,7 +16,7 @@ import Unauthorized from './components/Unauthorized';
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <Router future={{ v7_startTransition: true }}>
         <div className="App">
           <Routes>
             <Route path="/" element={<Home />} />

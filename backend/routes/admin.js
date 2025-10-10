@@ -69,8 +69,8 @@ router.post('/', adminRegisterValidation, async (req, res) => {
 
     // Handle logo upload if provided
     let logoPath = null;
-    if (req.files && req.files.logo) {
-      const logo = req.files.logo;
+    const logoFile = req.files ? req.files.find(f => f.fieldname === 'logo') : null;
+    if (logoFile) {
       const uploadDir = path.join(__dirname, '../uploads/logos');
 
       // Ensure upload directory exists
@@ -79,11 +79,11 @@ router.post('/', adminRegisterValidation, async (req, res) => {
       }
 
       // Generate unique filename
-      const fileName = `admin_${Date.now()}_${logo.name}`;
+      const fileName = `admin_${Date.now()}_${logoFile.originalname}`;
       const filePath = path.join(uploadDir, fileName);
 
-      // Move file to upload directory
-      await logo.mv(filePath);
+      // Move file from multer dest to logos directory
+      fs.renameSync(path.join(__dirname, '../', logoFile.path), filePath);
       logoPath = `/uploads/logos/${fileName}`;
     }
 
@@ -158,8 +158,8 @@ router.post('/employees', employeeCreateValidation, async (req, res) => {
 
     // Handle avatar upload if provided
     let avatarPath = null;
-    if (req.files && req.files.avatar) {
-      const avatar = req.files.avatar;
+    const avatarFile = req.files ? req.files.find(f => f.fieldname === 'avatar') : null;
+    if (avatarFile) {
       const uploadDir = path.join(__dirname, '../uploads/avatars');
 
       // Ensure upload directory exists
@@ -168,18 +168,18 @@ router.post('/employees', employeeCreateValidation, async (req, res) => {
       }
 
       // Generate unique filename
-      const fileName = `avatar_${Date.now()}_${avatar.name}`;
+      const fileName = `avatar_${Date.now()}_${avatarFile.originalname}`;
       const filePath = path.join(uploadDir, fileName);
 
-      // Move file to upload directory
-      await avatar.mv(filePath);
+      // Move file from multer dest to avatars directory
+      fs.renameSync(path.join(__dirname, '../', avatarFile.path), filePath);
       avatarPath = `/uploads/avatars/${fileName}`;
     }
 
     // Handle documents upload
     let documentPaths = [];
-    if (req.files && req.files.documents) {
-      const documents = Array.isArray(req.files.documents) ? req.files.documents : [req.files.documents];
+    const docFiles = req.files ? req.files.filter(f => f.fieldname === 'documents') : [];
+    if (docFiles.length > 0) {
       const uploadDir = path.join(__dirname, '../uploads/documents');
 
       // Ensure upload directory exists
@@ -187,10 +187,10 @@ router.post('/employees', employeeCreateValidation, async (req, res) => {
         fs.mkdirSync(uploadDir, { recursive: true });
       }
 
-      for (const doc of documents) {
-        const fileName = `doc_${Date.now()}_${doc.name}`;
+      for (const doc of docFiles) {
+        const fileName = `doc_${Date.now()}_${doc.originalname}`;
         const filePath = path.join(uploadDir, fileName);
-        await doc.mv(filePath);
+        fs.renameSync(path.join(__dirname, '../', doc.path), filePath);
         documentPaths.push(`/uploads/documents/${fileName}`);
       }
     }

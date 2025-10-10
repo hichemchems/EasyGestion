@@ -2,8 +2,8 @@ import axios from 'axios';
 import jwt_decode from 'jwt-decode';
 import { createContext, useContext, useEffect, useState } from 'react';
 
-// Set axios base URL
-axios.defaults.baseURL = '/api/v1';
+// Set axios base URL for local development
+axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api/v1';
 
 const AuthContext = createContext();
 
