@@ -8,7 +8,6 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [loginAttempted, setLoginAttempted] = useState(false);
 
   const { login, user } = useAuth();
   const navigate = useNavigate();
@@ -17,7 +16,6 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setLoginAttempted(true);
     console.log('Login form submitted with:', { email, password });
 
     const result = await login(email, password);
@@ -26,23 +24,23 @@ const Login = () => {
 
     if (!result.success) {
       setError(result.error);
-      setLoginAttempted(false);
     }
 
     setLoading(false);
   };
 
-  // Navigate after successful login when user state is updated
+  // Redirect if already logged in
   useEffect(() => {
-    if (loginAttempted && user) {
+    if (user) {
       const role = user.role;
-      // Use setTimeout to ensure state update completes before navigation
-      setTimeout(() => {
-        navigate(role === 'admin' || role === 'superAdmin' ? '/admin-dashboard' : '/user-dashboard', { replace: true });
-        setLoginAttempted(false);
-      }, 0);
+      const dashboardPath = role === 'admin' || role === 'superAdmin' ? '/admin-dashboard' : '/user-dashboard';
+      window.location.replace(dashboardPath);
     }
-  }, [user, loginAttempted, navigate]);
+  }, [user]);
+
+  if (user) {
+    return <div style={styles.redirecting}>Redirection vers le tableau de bord...</div>;
+  }
 
   return (
     <div style={styles.container}>
@@ -106,6 +104,14 @@ const styles = {
     minHeight: '100vh',
     backgroundColor: '#f5f5f5',
     padding: '20px'
+  },
+  redirecting: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '100vh',
+    fontSize: '18px',
+    color: '#333'
   },
   card: {
     backgroundColor: 'white',
