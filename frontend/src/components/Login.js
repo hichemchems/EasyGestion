@@ -36,8 +36,11 @@ const Login = () => {
   useEffect(() => {
     if (loginAttempted && user) {
       const role = user.role;
-      navigate(role === 'admin' || role === 'superAdmin' ? '/admin-dashboard' : '/user-dashboard', { replace: true });
-      setLoginAttempted(false);
+      // Use setTimeout to ensure state update completes before navigation
+      setTimeout(() => {
+        navigate(role === 'admin' || role === 'superAdmin' ? '/admin-dashboard' : '/user-dashboard', { replace: true });
+        setLoginAttempted(false);
+      }, 0);
     }
   }, [user, loginAttempted, navigate]);
 
