@@ -1,2 +1,4 @@
-- [x] Fix proxy target in frontend/src/setupProxy.js to point to backend on port 3001
-- [x] Add future flag to BrowserRouter in frontend/src/App.js to suppress React Router warning
+- [x] Modify frontend/src/setupProxy.js to hardcode proxy target to 'http://localhost:3001' for dev
+- [x] Update frontend/src/contexts/AuthContext.js to use REACT_APP_API_URL as axios baseURL when available
+- [x] Remove React Router v7_startTransition flag from frontend/package.json to eliminate warning
+- [ ] Test admin registration after changes
