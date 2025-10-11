@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { useAuth } from '../contexts/AuthContext';
 import '../styles/colors.css';
 
 const ReceiptEntry = ({ employeeId, onReceiptAdded }) => {
