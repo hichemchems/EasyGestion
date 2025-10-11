@@ -96,7 +96,7 @@ const CreateEmployee = () => {
     });
 
     try {
-      await axios.post('/admin/employees', data, {
+      await axios.post('/api/v1/admin/employees', data, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

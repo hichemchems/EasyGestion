@@ -4,6 +4,7 @@ import '../styles/colors.css';
 
 const SalaryViewing = () => {
   const [salaries, setSalaries] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedEmployee, setSelectedEmployee] = useState('');
   const [period, setPeriod] = useState({
@@ -28,12 +29,26 @@ const SalaryViewing = () => {
   }, [selectedEmployee, period]);
 
   useEffect(() => {
-    fetchSalaries();
-  }, [fetchSalaries]);
+    const fetchData = async () => {
+      try {
+        const [salariesRes, employeesRes] = await Promise.all([
+          axios.get('/api/v1/salaries'),
+          axios.get('/api/v1/admin/dashboard/sorted-barbers')
+        ]);
+        setSalaries(salariesRes.data.salaries || []);
+        setEmployees(employeesRes.data.barbers || []);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleGenerateSalary = async (employeeId) => {
     try {
-      await axios.post('/api/salaries/generate', {
+      await axios.post('/api/v1/salaries/generate', {
         employee_id: employeeId,
         period_start: period.start_date,
         period_end: period.end_date
@@ -68,7 +83,9 @@ const SalaryViewing = () => {
             style={styles.filterSelect}
           >
             <option value="">Tous les employés</option>
-            {/* TODO: Fetch employees list */}
+            {employees.map(employee => (
+              <option key={employee.id} value={employee.id}>{employee.name}</option>
+            ))}
           </select>
         </div>
         <div style={styles.filterGroup}>

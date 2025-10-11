@@ -16,7 +16,7 @@ const AdminChargeForm = () => {
   useEffect(() => {
     const fetchCharges = async () => {
       try {
-        const response = await axios.get('/api/admin/charges');
+        const response = await axios.get('/api/v1/admin/charges');
         if (response.data.charges && response.data.charges.length > 0) {
           setCharges(response.data.charges[0]);
         }
@@ -40,7 +40,7 @@ const AdminChargeForm = () => {
     setSuccess(false);
 
     try {
-      await axios.post('/api/admin/charges', {
+      await axios.post('/api/v1/admin/charges', {
         rent: parseFloat(charges.rent),
         charges: parseFloat(charges.charges),
         operating_costs: parseFloat(charges.operating_costs),

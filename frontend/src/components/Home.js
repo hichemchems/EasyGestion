@@ -100,7 +100,7 @@ const Home = () => {
 
     try {
       console.log('Making axios POST request');
-      const response = await axios.post('/admin', formData, {
+      const response = await axios.post('/api/v1/admin', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

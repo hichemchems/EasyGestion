@@ -22,7 +22,7 @@ const PackageManagement = () => {
   const fetchPackages = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/packages/admin');
+      const response = await axios.get('/api/v1/packages/admin');
       setPackages(response.data.packages);
       setError('');
     } catch (err) {
@@ -42,9 +42,9 @@ const PackageManagement = () => {
       };
 
       if (editingPackage) {
-        await axios.put(`/packages/${editingPackage.id}`, data);
+        await axios.put(`/api/v1/packages/${editingPackage.id}`, data);
       } else {
-        await axios.post('/packages', data);
+        await axios.post('/api/v1/packages', data);
       }
 
       fetchPackages();
@@ -70,7 +70,7 @@ const PackageManagement = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Êtes-vous sûr de vouloir désactiver cette prestation ?')) {
       try {
-        await axios.delete(`/packages/${id}`);
+        await axios.delete(`/api/v1/packages/${id}`);
         fetchPackages();
       } catch (err) {
         setError('Erreur lors de la suppression de la prestation');

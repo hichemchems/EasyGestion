@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import './styles/colors.css';
 
 const AnalyticsDashboard = () => {
@@ -10,17 +10,13 @@ const AnalyticsDashboard = () => {
   const [period, setPeriod] = useState('monthly');
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, [period]);
-
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     try {
       const [turnoverRes, evolutionRes, profitRes, performanceRes] = await Promise.all([
-        axios.get(`/api/analytics/turnover?period=${period}`),
-        axios.get(`/api/analytics/evolution?months=12`),
-        axios.get(`/api/analytics/profit?period=${period}`),
-        axios.get(`/api/analytics/performance?period=${period}`)
+        axios.get(`/api/v1/analytics/turnover?period=${period}`),
+        axios.get(`/api/v1/analytics/evolution?months=12`),
+        axios.get(`/api/v1/analytics/profit?period=${period}`),
+        axios.get(`/api/v1/analytics/performance?period=${period}`)
       ]);
 
       setTurnover(turnoverRes.data);
@@ -31,7 +27,11 @@ const AnalyticsDashboard = () => {
     } catch (err) {
       setError('Failed to load analytics data');
     }
-  };
+  }, [period]);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, [fetchAnalytics]);
 
   return (
     <div style={{ color: 'var(--color-black)', backgroundColor: 'var(--color-white)', padding: '1rem' }}>

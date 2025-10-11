@@ -24,7 +24,7 @@ const ExpenseManagement = () => {
       if (filters.start_date) params.start_date = filters.start_date;
       if (filters.end_date) params.end_date = filters.end_date;
 
-      const response = await axios.get('/api/expenses', { params });
+      const response = await axios.get('/api/v1/expenses', { params });
       setExpenses(response.data.expenses || []);
     } catch (error) {
       console.error('Error fetching expenses:', error);
@@ -40,7 +40,7 @@ const ExpenseManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/expenses', {
+      await axios.post('/api/v1/expenses', {
         ...formData,
         amount: parseFloat(formData.amount)
       });
@@ -59,7 +59,7 @@ const ExpenseManagement = () => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette dépense?')) return;
 
     try {
-      await axios.delete(`/api/expenses/${id}`);
+      await axios.delete(`/api/v1/expenses/${id}`);
       alert('Dépense supprimée avec succès!');
       fetchExpenses();
     } catch (error) {

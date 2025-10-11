@@ -45,7 +45,7 @@ services:
     ports:
       - "3001:3000"
     environment:
-      REACT_APP_API_URL: /api/v1
+      REACT_APP_API_URL: http://backend:5000/api/v1
     depends_on:
       backend:
         condition: service_healthy
