@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import '../styles/colors.css';
@@ -9,7 +9,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -22,15 +22,25 @@ const Login = () => {
 
     console.log('Login result:', result);
 
-    if (result.success) {
-      const role = result.user.role;
-      navigate(role === 'admin' || role === 'superAdmin' ? '/admin-dashboard' : '/user-dashboard');
-    } else {
+    if (!result.success) {
       setError(result.error);
     }
 
     setLoading(false);
   };
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      const role = user.role;
+      const dashboardPath = role === 'admin' || role === 'superAdmin' ? '/admin-dashboard' : '/user-dashboard';
+      window.location.replace(dashboardPath);
+    }
+  }, [user]);
+
+  if (user) {
+    return <div style={styles.redirecting}>Redirection vers le tableau de bord...</div>;
+  }
 
   return (
     <div style={styles.container}>
@@ -94,6 +104,14 @@ const styles = {
     minHeight: '100vh',
     backgroundColor: '#f5f5f5',
     padding: '20px'
+  },
+  redirecting: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '100vh',
+    fontSize: '18px',
+    color: '#333'
   },
   card: {
     backgroundColor: 'white',
