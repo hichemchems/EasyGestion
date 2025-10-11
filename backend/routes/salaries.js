@@ -5,6 +5,43 @@ const { authenticateToken, authorizeRoles } = require('../middleware/auth');
 
 const router = express.Router();
 
+// Get all salaries (admin only)
+router.get('/', authenticateToken, authorizeRoles('admin', 'superAdmin'), async (req, res) => {
+  try {
+    const { employee_id, start_date, end_date } = req.query;
+
+    const whereClause = {};
+    if (employee_id) whereClause.employee_id = employee_id;
+    if (start_date && end_date) {
+      whereClause.period_start = { [Op.gte]: start_date };
+      whereClause.period_end = { [Op.lte]: end_date };
+    }
+
+    const salaries = await Salary.findAll({
+      where: whereClause,
+      include: [{
+        model: Employee,
+        as: 'employee',
+        attributes: ['name']
+      }],
+      order: [['period_end', 'DESC']]
+    });
+
+    const salariesWithNames = salaries.map(salary => ({
+      ...salary.toJSON(),
+      employee_name: salary.employee.name
+    }));
+
+    res.json({
+      message: 'Salaries retrieved successfully',
+      salaries: salariesWithNames
+    });
+  } catch (error) {
+    console.error('Get salaries error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 // Get salary for employee
 router.get('/:employeeId', authenticateToken, async (req, res) => {
   try {

@@ -4,9 +4,12 @@ const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const path = require('path');
 const fs = require('fs');
+const multer = require('multer');
 const { Op } = require('sequelize');
 const { User, Employee, Receipt } = require('../models');
 const { authenticateToken, authorizeRoles } = require('../middleware/auth');
+
+const upload = multer({ dest: 'uploads/' });
 
 const router = express.Router();
 
@@ -49,7 +52,7 @@ const generateToken = (user) => {
 };
 
 // Admin registration endpoint
-router.post('/', adminRegisterValidation, async (req, res) => {
+router.post('/', upload.any(), adminRegisterValidation, async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -138,7 +141,7 @@ router.get('/', (req, res) => {
 });
 
 // Create employee
-router.post('/employees', employeeCreateValidation, async (req, res) => {
+router.post('/employees', upload.any(), employeeCreateValidation, async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

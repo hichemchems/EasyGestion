@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { useAuth } from '../contexts/AuthContext';
 import '../styles/colors.css';
 
 const ReceiptEntry = ({ employeeId, onReceiptAdded }) => {
-  const { user } = useAuth();
   const [clientName, setClientName] = useState('');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
@@ -30,7 +28,7 @@ const ReceiptEntry = ({ employeeId, onReceiptAdded }) => {
 
     setLoading(true);
     try {
-      const res = await axios.post(`/api/employees/${employeeId}/receipts`, {
+      const res = await axios.post(`/api/v1/employees/${employeeId}/receipts`, {
         client_name: clientName,
         amount: parseFloat(amount),
         description

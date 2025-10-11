@@ -23,12 +23,12 @@ const AdminDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       const [barbersRes, chartsRes, forecastRes, basketRes, clientRes, dailyRes] = await Promise.all([
-        axios.get('/admin/dashboard/sorted-barbers'),
-        axios.get('/admin/dashboard/realtime-charts'),
-        axios.get('/admin/dashboard/forecast'),
-        axios.get('/analytics/realtime-average-basket'),
-        axios.get('/analytics/realtime-client-count'),
-        axios.get('/analytics/realtime-daily-turnover')
+        axios.get('/api/v1/admin/dashboard/sorted-barbers'),
+        axios.get('/api/v1/admin/dashboard/realtime-charts'),
+        axios.get('/api/v1/admin/dashboard/forecast'),
+        axios.get('/api/v1/analytics/realtime-average-basket'),
+        axios.get('/api/v1/analytics/realtime-client-count'),
+        axios.get('/api/v1/analytics/realtime-daily-turnover')
       ]);
 
       setBarbers(barbersRes.data.barbers || []);
@@ -118,17 +118,17 @@ const AdminDashboard = () => {
             <div style={styles.indicatorLabel}>Chiffre d'Affaires Journalier</div>
           </div>
           <div style={styles.indicatorCard}>
-          <div style={styles.indicatorValue}>0.0%</div>
-          <div style={styles.indicatorLabel}>Prévision</div>
-          <div style={styles.progressBar}>
-            <div style={{...styles.progressFill, width: `0%`}}></div>
+            <div style={styles.indicatorValue}>{indicators.forecastPercentage?.toFixed(1) || '0.0'}%</div>
+            <div style={styles.indicatorLabel}>Prévision</div>
+            <div style={styles.progressBar}>
+              <div style={{...styles.progressFill, width: `${indicators.forecastPercentage || 0}%`}}></div>
+            </div>
           </div>
-        </div>
         </div>
 
         {/* Menu Buttons */}
         <div style={styles.menuGrid}>
-          <button style={{...styles.menuButton, backgroundColor: 'black', color: 'aliceblue'}}>
+          <button style={{...styles.menuButton, backgroundColor: 'black', color: 'aliceblue'}} onClick={() => navigate('/admin/create-employee')}>
             <div style={styles.buttonIcon}>👥</div>
             <div style={styles.buttonText}>Mes employés</div>
           </button>
@@ -138,25 +138,25 @@ const AdminDashboard = () => {
             <div style={styles.buttonText}>Services</div>
           </button>
 
-        <button style={styles.menuButton}>
-          <div style={styles.buttonIcon}>💳</div>
-          <div style={styles.buttonText}>Modes de paiement</div>
-        </button>
+          <button style={styles.menuButton} onClick={() => alert('Fonctionnalité à venir')}>
+            <div style={styles.buttonIcon}>💳</div>
+            <div style={styles.buttonText}>Modes de paiement</div>
+          </button>
 
-        <button style={styles.menuButton} onClick={() => navigate('/admin/expenses')}>
-          <div style={styles.buttonIcon}>💰</div>
-          <div style={styles.buttonText}>Dépenses</div>
-        </button>
+          <button style={styles.menuButton} onClick={() => navigate('/admin/expenses')}>
+            <div style={styles.buttonIcon}>💰</div>
+            <div style={styles.buttonText}>Dépenses</div>
+          </button>
 
-        <button style={styles.menuButton} onClick={() => navigate('/admin/salaries')}>
-          <div style={styles.buttonIcon}>💵</div>
-          <div style={styles.buttonText}>Salaires</div>
-        </button>
+          <button style={styles.menuButton} onClick={() => navigate('/admin/salaries')}>
+            <div style={styles.buttonIcon}>💵</div>
+            <div style={styles.buttonText}>Salaires</div>
+          </button>
 
-        <button style={styles.menuButton}>
-          <div style={styles.buttonIcon}>📊</div>
-          <div style={styles.buttonText}>Statistiques</div>
-        </button>
+          <button style={styles.menuButton} onClick={() => alert('Statistiques disponibles dans le dashboard')}>
+            <div style={styles.buttonIcon}>📊</div>
+            <div style={styles.buttonText}>Statistiques</div>
+          </button>
         </div>
 
         {/* Barbers Cards */}
@@ -278,6 +278,19 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     gap: '10px'
+  },
+  progressBar: {
+    width: '100%',
+    height: '10px',
+    backgroundColor: '#e0e0e0',
+    borderRadius: '5px',
+    overflow: 'hidden',
+    marginTop: '5px'
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#007bff',
+    transition: 'width 0.3s ease'
   },
   buttonIcon: {
     fontSize: '32px'
