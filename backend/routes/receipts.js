@@ -2,7 +2,6 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { Receipt, Employee } = require('../models');
 const { authenticateToken, authorizeRoles } = require('../middleware/auth');
-const { io } = require('../index');
 
 const router = express.Router();
 
@@ -77,6 +76,7 @@ router.post('/:id/receipts', authenticateToken, canAccessEmployee, receiptValida
     });
 
     // Emit real-time update
+    const { io } = require('../index');
     io.emit('receipt-created', {
       employee_id: id,
       receipt: receipt
@@ -119,6 +119,7 @@ router.put('/:id/receipts/:receiptId', authenticateToken, canAccessEmployee, rec
     });
 
     // Emit real-time update
+    const { io } = require('../index');
     io.emit('receipt-updated', {
       employee_id: id,
       receipt: receipt
@@ -151,6 +152,7 @@ router.delete('/:id/receipts/:receiptId', authenticateToken, canAccessEmployee, 
     await receipt.destroy();
 
     // Emit real-time update
+    const { io } = require('../index');
     io.emit('receipt-deleted', {
       employee_id: id,
       receipt_id: receiptId

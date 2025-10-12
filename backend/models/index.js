@@ -29,7 +29,7 @@ Employee.hasMany(Salary, { foreignKey: 'employee_id', onDelete: 'CASCADE' });
 Salary.belongsTo(Employee, { foreignKey: 'employee_id' });
 
 Employee.hasMany(Goal, { foreignKey: 'employee_id', onDelete: 'CASCADE' });
-Goal.belongsTo(Employee, { foreignKey: 'employee_id' });
+Goal.belongsTo(Employee, { foreignKey: 'employee_id', as: 'employee' });
 
 Employee.hasMany(Alert, { foreignKey: 'employee_id', onDelete: 'CASCADE' });
 Alert.belongsTo(Employee, { foreignKey: 'employee_id' });
