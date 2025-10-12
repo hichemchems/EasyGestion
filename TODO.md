@@ -161,3 +161,11 @@ To ensure all CRUD operations and creation forms are properly parameterized with
   - [ ] Test Frontend Forms: Admin registration form, login form, and any creation forms for main entities.
   - [ ] Test Database Links: Verify data persistence and associations (e.g., Goals with Employees).
   - [ ] Test End-to-End: Browser test for admin creation flow, API calls via curl.
+
+## 8. Add Confirm Password Validation to Admin Registration
+- **Change**: Update `backend/routes/admin.js` to add validation for the 'confirmPassword' field in the admin registration endpoint. Add a custom validator to ensure 'confirmPassword' matches 'password' before hashing and saving the user.
+- **Why**: The curl command includes 'confirmPassword', but the backend currently ignores it, which could lead to registration with mismatched passwords if not validated. This ensures password confirmation is enforced on the server side, improving security and user experience by preventing accidental mismatches.
+- **Implementation Details**:
+  - Add `body('confirmPassword').custom((value, { req }) => { if (value !== req.body.password) { throw new Error('Password confirmation does not match password'); } return true; })` to `adminRegisterValidation`.
+  - No additional dependencies needed; uses existing express-validator.
+- **Verification**: Test POST /api/v1/admin with matching and non-matching passwords to ensure validation works.
