@@ -31,3 +31,133 @@
   - Updated CORS configuration in `backend/index.js` to use a function that checks allowed origins for both express and socket.io, and added allowedHeaders for content-type.
   - Added explicit OPTIONS handler in `backend/routes/admin.js` to respond to preflight requests.
 - **Verification**: Tested endpoint with curl - POST works. Frontend should now be able to register admin successfully.
+
+## 7. Verification Steps for CRUD Operations and Creation Forms
+To ensure all CRUD operations and creation forms are properly parameterized with correct information and linked to the database, perform the following verification steps. These steps cover backend routes, frontend forms, database connections, and end-to-end functionality.
+
+### Backend Route Verification
+- [ ] **Admin Routes** (`backend/routes/admin.js`):
+  - [ ] POST /api/v1/admin: Verify creates admin user with name, email, siret, phone, password, logo. Check validation (e.g., password strength, SIRET length). Ensure data is saved to database (Admin model).
+  - [ ] GET /api/v1/admin: Verify retrieves admin data correctly.
+  - [ ] PUT /api/v1/admin/:id: Verify updates admin data.
+  - [ ] DELETE /api/v1/admin/:id: Verify deletes admin data.
+- [ ] **Auth Routes** (`backend/routes/auth.js`):
+  - [ ] POST /api/v1/auth/login: Verify login with email/password, returns JWT token.
+  - [ ] POST /api/v1/auth/register: Verify user registration.
+  - [ ] GET /api/v1/auth/me: Verify retrieves current user data.
+- [ ] **Users Routes** (`backend/routes/users.js`):
+  - [ ] GET /api/v1/users: Verify lists all users.
+  - [ ] POST /api/v1/users: Verify creates new user.
+  - [ ] GET /api/v1/users/:id: Verify retrieves specific user.
+  - [ ] PUT /api/v1/users/:id: Verify updates user.
+  - [ ] DELETE /api/v1/users/:id: Verify deletes user.
+- [ ] **Employees Routes** (`backend/routes/employees.js`):
+  - [ ] GET /api/v1/employees: Verify lists employees.
+  - [ ] POST /api/v1/employees: Verify creates employee with correct fields (name, email, etc.).
+  - [ ] GET /api/v1/employees/:id: Verify retrieves employee.
+  - [ ] PUT /api/v1/employees/:id: Verify updates employee.
+  - [ ] DELETE /api/v1/employees/:id: Verify deletes employee.
+- [ ] **Packages Routes** (`backend/routes/packages.js`):
+  - [ ] GET /api/v1/packages: Verify lists packages.
+  - [ ] POST /api/v1/packages: Verify creates package.
+  - [ ] GET /api/v1/packages/:id: Verify retrieves package.
+  - [ ] PUT /api/v1/packages/:id: Verify updates package.
+  - [ ] DELETE /api/v1/packages/:id: Verify deletes package.
+- [ ] **Receipts Routes** (`backend/routes/receipts.js`):
+  - [ ] GET /api/v1/receipts: Verify lists receipts.
+  - [ ] POST /api/v1/receipts: Verify creates receipt, emits socket event.
+  - [ ] GET /api/v1/receipts/:id: Verify retrieves receipt.
+  - [ ] PUT /api/v1/receipts/:id: Verify updates receipt.
+  - [ ] DELETE /api/v1/receipts/:id: Verify deletes receipt.
+- [ ] **Expenses Routes** (`backend/routes/expenses.js`):
+  - [ ] GET /api/v1/expenses: Verify lists expenses.
+  - [ ] POST /api/v1/expenses: Verify creates expense.
+  - [ ] GET /api/v1/expenses/:id: Verify retrieves expense.
+  - [ ] PUT /api/v1/expenses/:id: Verify updates expense.
+  - [ ] DELETE /api/v1/expenses/:id: Verify deletes expense.
+- [ ] **AdminCharges Routes** (`backend/routes/adminCharges.js`):
+  - [ ] GET /api/v1/adminCharges: Verify lists admin charges.
+  - [ ] POST /api/v1/adminCharges: Verify creates admin charge.
+  - [ ] GET /api/v1/adminCharges/:id: Verify retrieves admin charge.
+  - [ ] PUT /api/v1/adminCharges/:id: Verify updates admin charge.
+  - [ ] DELETE /api/v1/adminCharges/:id: Verify deletes admin charge.
+- [ ] **Alerts Routes** (`backend/routes/alerts.js`):
+  - [ ] GET /api/v1/alerts: Verify lists alerts.
+- [ ] **Analytics Routes** (`backend/routes/analytics.js`):
+  - [ ] GET /api/v1/analytics: Verify retrieves analytics data.
+- [ ] **Salaries Routes** (`backend/routes/salaries.js`):
+  - [ ] GET /api/v1/salaries: Verify lists salaries.
+  - [ ] POST /api/v1/salaries: Verify creates salary.
+  - [ ] GET /api/v1/salaries/:id: Verify retrieves salary.
+  - [ ] PUT /api/v1/salaries/:id: Verify updates salary.
+  - [ ] DELETE /api/v1/salaries/:id: Verify deletes salary.
+- [ ] **Goals Routes** (`backend/routes/goals.js`):
+  - [ ] GET /api/v1/goals: Verify lists goals with employee association.
+  - [ ] POST /api/v1/goals: Verify creates goal.
+  - [ ] GET /api/v1/goals/:id: Verify retrieves goal.
+  - [ ] PUT /api/v1/goals/:id: Verify updates goal.
+  - [ ] DELETE /api/v1/goals/:id: Verify deletes goal.
+
+### Frontend Form Verification
+- [ ] **Admin Registration Form** (`frontend/src/components/Home.js`):
+  - [ ] Verify form collects name, email, siret, phone, password, confirmPassword, logo.
+  - [ ] Check validation matches backend (password strength, SIRET, phone).
+  - [ ] Ensure FormData is sent correctly to POST /api/v1/admin.
+  - [ ] Verify auto-login after registration.
+- [ ] **Login Form** (check frontend components):
+  - [ ] Verify collects email, password.
+  - [ ] Sends to POST /api/v1/auth/login.
+- [ ] **User Creation Form** (if exists):
+  - [ ] Verify fields match User model.
+  - [ ] Sends to POST /api/v1/users.
+- [ ] **Employee Creation Form** (if exists):
+  - [ ] Verify fields match Employee model.
+  - [ ] Sends to POST /api/v1/employees.
+- [ ] **Package Creation Form** (if exists):
+  - [ ] Verify fields match Package model.
+  - [ ] Sends to POST /api/v1/packages.
+- [ ] **Receipt Creation Form** (if exists):
+  - [ ] Verify fields match Receipt model.
+  - [ ] Sends to POST /api/v1/receipts.
+- [ ] **Expense Creation Form** (if exists):
+  - [ ] Verify fields match Expense model.
+  - [ ] Sends to POST /api/v1/expenses.
+- [ ] **AdminCharge Creation Form** (if exists):
+  - [ ] Verify fields match AdminCharge model.
+  - [ ] Sends to POST /api/v1/adminCharges.
+- [ ] **Salary Creation Form** (if exists):
+  - [ ] Verify fields match Salary model.
+  - [ ] Sends to POST /api/v1/salaries.
+- [ ] **Goal Creation Form** (if exists):
+  - [ ] Verify fields match Goal model, includes employee_id.
+  - [ ] Sends to POST /api/v1/goals.
+
+### Database and Model Verification
+- [ ] **Database Connection**: Verify Sequelize connects to MySQL database successfully (check backend logs).
+- [ ] **Model Associations**: Ensure all models in `backend/models/` have correct associations (e.g., Goal belongsTo Employee).
+- [ ] **Migrations and Seeds**: Verify migrations run and seed data is inserted correctly.
+- [ ] **Data Integrity**: For each CRUD, check that data is correctly saved/retrieved from database tables.
+
+### End-to-End Testing
+- [ ] **API Testing**: Use curl or Postman to test each endpoint with valid/invalid data.
+- [ ] **Frontend Testing**: Use browser to test forms, ensure no errors in console, data persists.
+- [ ] **Socket.IO**: For receipts, verify real-time updates work.
+- [ ] **Authentication**: Ensure protected routes require JWT.
+- [ ] **Error Handling**: Verify proper error responses for invalid data.
+
+### General Checks
+- [ ] **CORS**: Ensure all routes allow requests from frontend origin.
+- [ ] **Validation**: Backend validation matches frontend.
+- [ ] **File Uploads**: For forms with files (e.g., logo), verify multer handles uploads correctly.
+- [ ] **Scheduler**: Verify daily alert job runs without errors.
+
+### Testing Options and Execution
+- [ ] Decide on testing level: Proceed with critical-path testing (key elements only, like admin creation and main CRUD).
+- [ ] **Critical-Path Testing Steps**:
+  - [ ] Test Admin Registration: POST /api/v1/admin with valid data, verify DB save, auto-login.
+  - [ ] Test Admin CRUD: GET, PUT, DELETE /api/v1/admin.
+  - [ ] Test Auth: Login with created admin, verify JWT.
+  - [ ] Test Main Entities CRUD: Users, Employees, Packages, Receipts, Expenses, Salaries, Goals (POST, GET, PUT, DELETE for each).
+  - [ ] Test Frontend Forms: Admin registration form, login form, and any creation forms for main entities.
+  - [ ] Test Database Links: Verify data persistence and associations (e.g., Goals with Employees).
+  - [ ] Test End-to-End: Browser test for admin creation flow, API calls via curl.
