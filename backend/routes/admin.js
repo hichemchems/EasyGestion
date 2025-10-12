@@ -13,6 +13,11 @@ const upload = multer({ dest: 'uploads/' });
 
 const router = express.Router();
 
+// Handle OPTIONS for CORS preflight
+router.options('/', (req, res) => {
+  res.sendStatus(200);
+});
+
 // Test route
 router.get('/test', (req, res) => {
   res.json({ message: 'Admin routes working' });
