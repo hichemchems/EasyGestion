@@ -32,7 +32,8 @@ const adminRegisterValidation = [
   body('phone').isLength({ min: 10 }).withMessage('Phone number must be at least 10 digits'),
   body('password').isLength({ min: 14 }).withMessage('Password must be at least 14 characters')
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
-    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character')
+    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
+  body('confirmPassword').custom((value, { req }) => { if (value !== req.body.password) { throw new Error('Password confirmation does not match password'); } return true; })
 ];
 
 // Validation rules for employee creation
