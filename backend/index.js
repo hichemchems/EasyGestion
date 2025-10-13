@@ -53,11 +53,6 @@ app.use(cors({
   credentials: true,
   allowedHeaders: ['content-type', 'authorization', 'x-requested-with']
 }));
-const upload = multer({
-  dest: 'uploads/',
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
-});
-app.use(upload.any());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());

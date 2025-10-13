@@ -58,12 +58,21 @@ const generateToken = (user) => {
 };
 
 // Admin registration endpoint
-router.post('/', upload.any(), adminRegisterValidation, async (req, res) => {
+router.post('/', upload.fields([{ name: 'name' }, { name: 'email' }, { name: 'siret' }, { name: 'phone' }, { name: 'password' }, { name: 'confirmPassword' }, { name: 'logo', maxCount: 1 }]), adminRegisterValidation, async (req, res) => {
+  console.log('Admin registration request received');
+  console.log('Request body:', req.body);
+  console.log('Request files:', req.files);
+  console.log('Request body keys:', Object.keys(req.body));
+  console.log('Request body confirmPassword:', req.body.confirmPassword);
   try {
+    console.log('Starting validation check');
     const errors = validationResult(req);
+    console.log('Validation errors:', errors.array());
     if (!errors.isEmpty()) {
+      console.log('Validation failed, returning errors');
       return res.status(400).json({ errors: errors.array() });
     }
+    console.log('Validation passed');
 
     const { name, email, siret, phone, password } = req.body;
 

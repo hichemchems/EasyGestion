@@ -3,7 +3,7 @@ import jwt_decode from 'jwt-decode';
 import { createContext, useContext, useEffect, useState } from 'react';
 
 // Set axios base URL for local development
-axios.defaults.baseURL = process.env.REACT_APP_API_URL || '/api/v1';
+axios.defaults.baseURL = process.env.REACT_APP_API_URL || '/api';
 
 const AuthContext = createContext();
 

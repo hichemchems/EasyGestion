@@ -2,10 +2,13 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 
 module.exports = function(app) {
   app.use(
-    '/api/v1',
+    '/api',
     createProxyMiddleware({
-      target: 'http://backend:5000',
+      target: process.env.REACT_APP_API_URL || 'http://backend:5000',
       changeOrigin: true,
+      pathRewrite: {
+        '^/api': '/api/v1'
+      }
     })
   );
 };
