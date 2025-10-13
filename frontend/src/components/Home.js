@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
+import { useState } from 'react';
+import { useDropzone } from 'react-dropzone';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import '../styles/colors.css';
 
@@ -76,56 +76,51 @@ const Home = () => {
     console.log('Starting admin registration process');
     console.log('Form data:', { name, email, siret, phone, password: '[HIDDEN]', confirmPassword: '[HIDDEN]', logo: logo ? logo.name : 'none' });
 
-    if (!validateForm()) {
-      console.log('Form validation failed');
+    // Validation côté frontend
+    console.log('Starting frontend validation');
+    const validationPassed = validateForm();
+    console.log('Frontend validation result:', validationPassed);
+    if (!validationPassed) {
+      console.log('Frontend validation failed, stopping submission');
       setLoading(false);
       return;
     }
+    console.log('Frontend validation passed');
 
-    console.log('Form validation passed');
-
+    // Création FormData
     const formData = new FormData();
     formData.append('name', name);
     formData.append('email', email);
     formData.append('siret', siret);
     formData.append('phone', phone);
     formData.append('password', password);
+    formData.append('confirmPassword', confirmPassword);
     if (logo) {
       formData.append('logo', logo);
     }
-
     console.log('FormData created:', Array.from(formData.entries()));
     console.log('Axios baseURL:', axios.defaults.baseURL);
     console.log('Sending admin registration request to:', axios.defaults.baseURL + '/admin');
 
     try {
       console.log('Making axios POST request');
-      const response = await axios.post('/api/v1/admin', formData, {
+      const response = await axios.post('/api/admin', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          'Content-Type': 'multipart/form-data',
+        },
       });
-      console.log('Registration response received:', response.data);
+      console.log('Registration successful, response:', response.data);
 
-      // Auto login after registration
-      console.log('Attempting auto-login');
-      const loginResult = await login(email, password);
-      if (loginResult.success) {
-        console.log('Login successful, navigating to dashboard');
-        navigate('/admin-dashboard');
-      } else {
-        console.log('Login failed:', loginResult.error);
-        setError('Registration successful, but login failed. Please try logging in manually.');
-      }
+      // Auto-login après enregistrement
+      console.log('Attempting auto-login with email:', email);
+      await login(email, password);
+      console.log('Auto-login successful, navigating to dashboard');
+      navigate('/dashboard');
     } catch (error) {
       console.log('Registration error:', error);
       console.log('Error response:', error.response);
       console.log('Error response data:', error.response?.data);
-      if (error.response?.data?.errors) {
-        setError(error.response.data.errors.map(err => err.msg).join(', '));
-      } else {
-        setError(error.response?.data?.message || 'Registration failed');
-      }
+      setError(error.response?.data?.message || 'Registration failed');
     } finally {
       setLoading(false);
     }

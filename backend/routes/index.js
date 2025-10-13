@@ -36,8 +36,8 @@ router.get('/health', (req, res) => {
 
 // Example route
 router.get('/', (req, res) => {
-  console.log('API v1 root route called');
-  res.json({ message: 'Welcome to EasyGestion API v1' });
+  console.log('API root route called');
+  res.json({ message: 'Welcome to EasyGestion API' });
 });
 
 console.log('Routes loaded successfully');

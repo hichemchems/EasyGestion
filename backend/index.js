@@ -17,20 +17,20 @@ const server = createServer(app);
 const io = new Server(server, {
   cors: {
     origin: function (origin, callback) {
-      const allowedOrigins = process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : ["http://localhost:3000", "http://localhost:3001"];
+      const allowedOrigins = process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002"];
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
       }
     },
-    methods: ["GET", "POST"]
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
   }
 });
 
 const scheduler = require('./scheduler')(io);
 
-// Middleware
+// Middleware - organized in correct order
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -43,7 +43,7 @@ app.use(helmet({
 }));
 app.use(cors({
   origin: function (origin, callback) {
-    const allowedOrigins = process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : ["http://localhost:3000", "http://localhost:3001"];
+    const allowedOrigins = process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002"];
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -53,11 +53,6 @@ app.use(cors({
   credentials: true,
   allowedHeaders: ['content-type', 'authorization', 'x-requested-with']
 }));
-const upload = multer({
-  dest: 'uploads/',
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
-});
-app.use(upload.any());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -72,8 +67,8 @@ app.use('/api/', limiter);
 // Health check
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
-// API versioning
-app.use('/api/v1', require('./routes'));
+// API routes
+app.use('/api', require('./routes'));
 
 // Socket.io
 io.on('connection', (socket) => {

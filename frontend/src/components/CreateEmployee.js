@@ -96,11 +96,7 @@ const CreateEmployee = () => {
     });
 
     try {
-      await axios.post('/api/v1/admin/employees', data, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      await axios.post('/api/v1/admin/employees', data);
 
       navigate('/admin/dashboard');
     } catch (error) {

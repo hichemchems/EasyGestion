@@ -21,7 +21,6 @@ router.get('/', authenticateToken, authorizeRoles('admin', 'superAdmin'), async 
       where: whereClause,
       include: [{
         model: Employee,
-        as: 'employee',
         attributes: ['name']
       }],
       order: [['period_end', 'DESC']]
@@ -29,7 +28,7 @@ router.get('/', authenticateToken, authorizeRoles('admin', 'superAdmin'), async 
 
     const salariesWithNames = salaries.map(salary => ({
       ...salary.toJSON(),
-      employee_name: salary.employee.name
+      employee_name: salary.Employee ? salary.Employee.name : 'Unknown'
     }));
 
     res.json({
