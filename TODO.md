@@ -1,113 +1,82 @@
-# TODO: Stratégie de vérification complète du Frontend EasyGestion
+# Backend Refactor and Middleware Integration TODO
 
-## Contexte
-Problème actuel: Le formulaire d'enregistrement admin ne fonctionne pas (erreur 504 Gateway Timeout). Le proxy entre frontend et backend semble mal configuré dans l'environnement Docker.
+## Overview
+Complete refactor of the backend to properly integrate middleware, fix networking issues, and ensure seamless frontend-backend communication. Focus on authentication, authorization, CORS, rate limiting, error handling, and API routing.
 
-## Stratégie de test systématique
-Pour éviter de tourner en rond, nous allons tester chaque partie du frontend de manière méthodique, en commençant par les éléments de base et en progressant vers les fonctionnalités complexes.
+## Tasks
 
-## TODO List - Vérification Frontend
+### 1. Backend Server Refactor (index.js)
+- [ ] Reorganize middleware stack in correct order:
+  - Helmet for security headers
+  - CORS configuration (allow localhost:3000)
+  - Express JSON/URL-encoded parsing
+  - Cookie parser
+  - Rate limiting
+  - Global error handler
+- [ ] Ensure proper database connection and sync
+- [ ] Set server to run on port 3001 for local development
+- [ ] Add Socket.io integration if needed
+- [ ] Test server startup without errors
 
-### 1. Infrastructure et Configuration de Base
-- [ ] Vérifier que tous les conteneurs Docker sont démarrés (backend, frontend, db)
-- [ ] Tester la connectivité réseau entre conteneurs (ping backend depuis frontend)
-- [ ] Vérifier les logs des conteneurs pour erreurs de démarrage
-- [ ] Confirmer que les ports sont correctement exposés (3001 pour frontend, 5002 pour backend)
+### 2. Middleware Updates
+- [ ] Update middleware/auth.js:
+  - [ ] Fix JWT token verification
+  - [ ] Implement role-based authorization (admin, user, superAdmin)
+  - [ ] Add proper error responses for unauthorized access
+- [ ] Ensure all protected routes use authentication middleware
+- [ ] Test middleware with sample requests
 
-### 2. Configuration Proxy et API
-- [ ] Tester le proxy setupProxy.js avec un curl simple vers /api/health
-- [ ] Vérifier que axios.defaults.baseURL est correctement défini dans AuthContext
-- [ ] Tester chaque endpoint API individuellement avec curl depuis le conteneur frontend
-- [ ] Confirmer que CORS est correctement configuré côté backend
+### 3. Routes Integration
+- [ ] Review all route files (admin.js, auth.js, employees.js, etc.)
+- [ ] Ensure admin registration route (/api/v1/admin) works with file uploads
+- [ ] Add authentication middleware to protected routes
+- [ ] Verify all endpoints return proper JSON responses
+- [ ] Test admin registration endpoint manually
 
-### 3. Composants de Base
-- [ ] Tester le rendu de base de chaque composant (sans API calls)
-- [ ] Vérifier que les routes React Router fonctionnent
-- [ ] Tester la navigation entre pages
-- [ ] Vérifier que les formulaires s'affichent correctement
+### 4. Database and Models
+- [ ] Ensure Sequelize models are properly defined
+- [ ] Test database connection (use Docker MySQL if local MySQL issues)
+- [ ] Run migrations if needed
+- [ ] Verify model relationships
 
-### 4. Authentification et Autorisation
-- [ ] Tester le composant Login (connexion utilisateur existant)
-- [ ] Tester le composant Home (enregistrement admin)
-- [ ] Vérifier que les tokens JWT sont stockés/récupérés correctement
-- [ ] Tester la protection des routes avec ProtectedRoute
+### 5. Frontend Proxy and Configuration
+- [ ] Update setupProxy.js to target localhost:3001
+- [ ] Update AuthContext.js axios baseURL to localhost:3001
+- [ ] Ensure proxy rewrites /api to /api/v1 correctly
+- [ ] Test proxy configuration
 
-### 5. Dashboard et Fonctionnalités Admin
-- [ ] Tester AdminDashboard après connexion réussie
-- [ ] Vérifier AnalyticsDashboard
-- [ ] Tester la création d'employés (CreateEmployee)
-- [ ] Tester la gestion des paquets (PackageManagement)
+### 6. CORS and Security
+- [ ] Configure CORS to allow frontend origin (localhost:3000)
+- [ ] Add proper CORS headers for credentials
+- [ ] Ensure Helmet doesn't block necessary functionality
+- [ ] Test cross-origin requests
 
-### 6. Gestion des Données
-- [ ] Tester ExpenseManagement
-- [ ] Tester ReceiptEntry
-- [ ] Tester SalaryViewing
-- [ ] Vérifier les appels API pour CRUD operations
+### 7. File Upload Handling
+- [ ] Ensure multer is properly configured for logo/avatar uploads
+- [ ] Test file upload in admin registration
+- [ ] Verify uploaded files are stored correctly
 
-### 7. Upload et Médias
-- [ ] Tester l'upload de fichiers (logos, etc.)
-- [ ] Vérifier que les fichiers sont stockés dans /uploads
-- [ ] Tester l'affichage des images uploadées
+### 8. Authentication Flow Testing
+- [ ] Test admin registration (frontend form submission)
+- [ ] Test login functionality
+- [ ] Test protected route access
+- [ ] Verify JWT tokens are set in cookies
 
-### 8. Tests d'Intégration
-- [ ] Tester un workflow complet: enregistrement → connexion → dashboard → CRUD
-- [ ] Vérifier la persistance des données en DB
-- [ ] Tester les erreurs et cas limites
-- [ ] Performance et temps de réponse
+### 9. Error Handling
+- [ ] Implement global error handler in backend
+- [ ] Ensure frontend handles backend errors properly
+- [ ] Test error scenarios (invalid data, unauthorized access)
 
-### 9. Tests de Régression
-- [ ] Retester tous les composants après corrections
-- [ ] Vérifier que les anciennes fonctionnalités marchent toujours
-- [ ] Tests cross-browser si nécessaire
+### 10. Full Integration Test
+- [ ] Start backend on port 3001
+- [ ] Start frontend on port 3000
+- [ ] Test complete admin registration flow
+- [ ] Test login and dashboard access
+- [ ] Verify no network errors or 504 timeouts
 
-## Commandes de Test Utiles
-
-### Tests réseau:
-```bash
-# Depuis le conteneur frontend
-curl http://backend:5000/health
-curl http://backend:5000/api/v1/admin/test
-
-# Depuis host
-curl http://localhost:3001
-curl http://localhost:5002/health
-```
-
-### Tests API:
-```bash
-# Test enregistrement admin
-curl -X POST http://localhost:5002/api/v1/admin \
-  -F "name=Test Admin" \
-  -F "email=test@example.com" \
-  -F "siret=12345678901234" \
-  -F "phone=+33123456789" \
-  -F "password=TestPassword123!"
-```
-
-### Logs:
-```bash
-# Voir logs des conteneurs
-docker-compose logs backend
-docker-compose logs frontend
-docker-compose logs db
-```
-
-## Priorités
-1. **Critique**: Corriger le proxy pour que les API calls passent
-2. **Haute**: Tester l'enregistrement admin (problème actuel)
-3. **Moyenne**: Vérifier tous les composants un par un
-4. **Basse**: Tests de performance et edge cases
-
-## Indicateurs de Progrès
-- [ ] Proxy fonctionnel (API calls passent)
-- [ ] Enregistrement admin réussi
-- [ ] Connexion utilisateur réussie
-- [ ] Toutes les pages accessibles
-- [ ] Toutes les fonctionnalités CRUD opérationnelles
-- [ ] Tests d'intégration passés
-
-## Notes pour éviter les boucles
-- Cocher chaque étape terminée dans ce TODO
-- Si un problème revient, noter la cause racine et la solution
-- Tester une fonctionnalité à la fois, pas tout en même temps
-- Documenter les erreurs rencontrées et leurs résolutions
+## Notes
+- Backend should run locally on port 3001 for development
+- Frontend proxy targets localhost:3001
+- Use Docker for database if local MySQL has issues
+- Do not modify TODO1.md as requested
+- Focus on fixing the 504 Gateway Timeout and network errors

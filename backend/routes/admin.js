@@ -58,7 +58,7 @@ const generateToken = (user) => {
 };
 
 // Admin registration endpoint
-router.post('/', upload.fields([{ name: 'name' }, { name: 'email' }, { name: 'siret' }, { name: 'phone' }, { name: 'password' }, { name: 'confirmPassword' }, { name: 'logo', maxCount: 1 }]), adminRegisterValidation, async (req, res) => {
+router.post('/', upload.fields([{ name: 'logo', maxCount: 1 }]), adminRegisterValidation, async (req, res) => {
   console.log('Admin registration request received');
   console.log('Request body:', req.body);
   console.log('Request files:', req.files);
@@ -87,7 +87,7 @@ router.post('/', upload.fields([{ name: 'name' }, { name: 'email' }, { name: 'si
 
     // Handle logo upload if provided
     let logoPath = null;
-    const logoFile = req.files ? req.files.find(f => f.fieldname === 'logo') : null;
+    const logoFile = req.files && req.files.logo ? req.files.logo[0] : null;
     if (logoFile) {
       const uploadDir = path.join(__dirname, '../uploads/logos');
 

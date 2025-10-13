@@ -19,7 +19,7 @@ const SalaryViewing = () => {
       if (period.start_date) params.start_date = period.start_date;
       if (period.end_date) params.end_date = period.end_date;
 
-      const response = await axios.get('/api/salaries', { params });
+      const response = await axios.get('/api/v1/salaries', { params });
       setSalaries(response.data.salaries || []);
     } catch (error) {
       console.error('Error fetching salaries:', error);

@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
+import { useState } from 'react';
+import { useDropzone } from 'react-dropzone';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import '../styles/colors.css';
 
