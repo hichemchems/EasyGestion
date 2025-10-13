@@ -255,7 +255,7 @@ router.post('/employees', upload.any(), employeeCreateValidation, async (req, re
 });
 
 // Get sorted barbers for dashboard
-router.get('/dashboard/sorted-barbers', authenticateToken, authorizeRoles('admin', 'superAdmin'), async (req, res) => {
+router.get('/dashboard/sorted-barbers', authenticateToken, authorizeRoles('admin'), async (req, res) => {
   try {
     const employees = await Employee.findAll({
       include: [{
@@ -336,7 +336,7 @@ router.get('/dashboard/sorted-barbers', authenticateToken, authorizeRoles('admin
 });
 
 // Get realtime charts data
-router.get('/dashboard/realtime-charts', authenticateToken, authorizeRoles('admin', 'superAdmin'), async (req, res) => {
+router.get('/dashboard/realtime-charts', authenticateToken, authorizeRoles('admin'), async (req, res) => {
   try {
     // Get last 7 days data
     const daily = [];
@@ -412,7 +412,7 @@ router.get('/dashboard/realtime-charts', authenticateToken, authorizeRoles('admi
 });
 
 // Get forecast data
-router.get('/dashboard/forecast', authenticateToken, authorizeRoles('admin', 'superAdmin'), async (req, res) => {
+router.get('/dashboard/forecast', authenticateToken, authorizeRoles('admin'), async (req, res) => {
   try {
     const currentYear = new Date().getFullYear();
     const startOfYear = new Date(currentYear, 0, 1);
