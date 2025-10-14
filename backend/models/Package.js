@@ -11,9 +11,21 @@ const Package = sequelize.define('Package', {
     type: DataTypes.STRING(100),
     allowNull: false
   },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
   price: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false
+  },
+  duration_months: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  features: {
+    type: DataTypes.JSON,
+    allowNull: true
   },
   is_active: {
     type: DataTypes.BOOLEAN,

@@ -27,7 +27,8 @@ router.get('/', authenticateToken, authorizeRoles('admin', 'superAdmin'), async 
     const users = await User.findAll({
       include: [{
         model: Employee,
-        as: 'Employee'
+        as: 'Employee',
+        attributes: ['id', 'user_id', 'first_name', 'last_name', 'email', 'phone', 'position', 'salary', 'hire_date', 'status', 'file_path', 'deduction_percentage', 'created_at', 'updated_at']
       }],
       attributes: { exclude: ['password_hash'] }
     });

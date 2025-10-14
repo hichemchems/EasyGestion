@@ -15,17 +15,43 @@ const Employee = sequelize.define('Employee', {
       key: 'id'
     }
   },
-  name: {
-    type: DataTypes.STRING(100),
-    allowNull: false
-  },
-  position: {
+  first_name: {
     type: DataTypes.STRING(50),
     allowNull: false
   },
+  last_name: {
+    type: DataTypes.STRING(50),
+    allowNull: false
+  },
+  email: {
+    type: DataTypes.STRING(100),
+    allowNull: false,
+    unique: true
+  },
+  phone: {
+    type: DataTypes.STRING(20),
+    allowNull: true
+  },
+  position: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  salary: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true
+  },
   hire_date: {
     type: DataTypes.DATE,
-    allowNull: false
+    allowNull: true
+  },
+  status: {
+    type: DataTypes.ENUM('active', 'inactive', 'terminated'),
+    allowNull: false,
+    defaultValue: 'active'
+  },
+  file_path: {
+    type: DataTypes.STRING(255),
+    allowNull: true
   },
   deduction_percentage: {
     type: DataTypes.DECIMAL(5, 2),
@@ -35,7 +61,9 @@ const Employee = sequelize.define('Employee', {
 
 }, {
   tableName: 'employees',
-  timestamps: false
+  timestamps: true,
+  createdAt: 'created_at',
+  updatedAt: 'updated_at'
 });
 
 module.exports = Employee;
