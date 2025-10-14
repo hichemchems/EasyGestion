@@ -2,15 +2,21 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.addColumn('users', 'reset_token', {
-      type: Sequelize.STRING(255),
-      allowNull: true
-    });
+    const tableDescription = await queryInterface.describeTable('users');
 
-    await queryInterface.addColumn('users', 'reset_token_expires', {
-      type: Sequelize.DATE,
-      allowNull: true
-    });
+    if (!tableDescription.reset_token) {
+      await queryInterface.addColumn('users', 'reset_token', {
+        type: Sequelize.STRING(255),
+        allowNull: true
+      });
+    }
+
+    if (!tableDescription.reset_token_expires) {
+      await queryInterface.addColumn('users', 'reset_token_expires', {
+        type: Sequelize.DATE,
+        allowNull: true
+      });
+    }
   },
 
   async down(queryInterface, Sequelize) {

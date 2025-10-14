@@ -75,25 +75,31 @@ router.post('/', upload.fields([{ name: 'logo', maxCount: 1 }]), adminRegisterVa
     console.log('Validation passed');
 
     const { name, email, siret, phone, password } = req.body;
+    console.log('Extracted user data: name, email, siret, phone, password (hidden)');
 
     // Check if user already exists
+    console.log('Checking if user already exists with email:', email);
     const existingUser = await User.findOne({
       where: { email }
     });
 
     if (existingUser) {
+      console.log('User already exists, registration failed');
       return res.status(400).json({ message: 'User with this email already exists' });
     }
+    console.log('User does not exist, proceeding with registration');
 
     // Handle logo upload if provided
     let logoPath = null;
     const logoFile = req.files && req.files.logo ? req.files.logo[0] : null;
     if (logoFile) {
+      console.log('Logo file provided, processing upload');
       const uploadDir = path.join(__dirname, '../uploads/logos');
 
       // Ensure upload directory exists
       if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
+        console.log('Created uploads/logos directory');
       }
 
       // Generate unique filename
@@ -103,15 +109,22 @@ router.post('/', upload.fields([{ name: 'logo', maxCount: 1 }]), adminRegisterVa
       // Move file from multer dest to logos directory
       fs.renameSync(path.join(__dirname, '../', logoFile.path), filePath);
       logoPath = `/uploads/logos/${fileName}`;
+      console.log('Logo uploaded successfully, path:', logoPath);
+    } else {
+      console.log('No logo provided, skipping upload');
     }
 
     // Hash password
+    console.log('Hashing password');
     const saltRounds = 12;
     const password_hash = await bcrypt.hash(password, saltRounds);
+    console.log('Password hashed successfully');
 
     // Create admin user
+    console.log('Creating admin user in database');
     const user = await User.create({
-      username: name, // Using name as username
+      username: email, // Using email as username for uniqueness
+      name, // Store display name separately
       email,
       password_hash,
       role: 'admin',
@@ -119,24 +132,31 @@ router.post('/', upload.fields([{ name: 'logo', maxCount: 1 }]), adminRegisterVa
       phone,
       logo_path: logoPath
     });
+    console.log('Admin user created successfully, user ID:', user.id);
 
     // Generate token
+    console.log('Generating JWT token');
     const token = generateToken(user);
+    console.log('JWT token generated successfully');
 
     // Set cookie
+    console.log('Setting authentication cookie');
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
+    console.log('Authentication cookie set');
 
+    console.log('Admin registration completed successfully');
     res.status(201).json({
       message: 'Admin registered successfully',
       token,
       user: {
         id: user.id,
         username: user.username,
+        name: user.name,
         email: user.email,
         role: user.role,
         siret: user.siret,
@@ -219,7 +239,8 @@ router.post('/employees', upload.any(), employeeCreateValidation, async (req, re
 
     // Create user
     const user = await User.create({
-      username: name,
+      username: email, // Using email as username for uniqueness
+      name, // Store display name separately
       email,
       password_hash,
       role: 'user' // Employees are users

@@ -537,12 +537,45 @@ router.get('/realtime-client-count', authenticateToken, async (req, res) => {
     res.json({
       message: 'Real-time client count retrieved successfully',
       date: today.toISOString().split('T')[0],
-      total_clients: totalClients,
+      client_count: totalClients,
       sales_clients: salesCount,
       receipt_clients: receiptsCount
     });
   } catch (error) {
     console.error('Get realtime client count error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Get real-time services count
+router.get('/realtime-services-count', authenticateToken, async (req, res) => {
+  try {
+    const today = new Date();
+    const { start, end } = getDateRange('daily', today);
+
+    const salesCount = await Sale.count({
+      where: {
+        date: { [Op.between]: [start, end] }
+      }
+    });
+
+    const receiptsCount = await Receipt.count({
+      where: {
+        date: { [Op.between]: [start, end] }
+      }
+    });
+
+    const totalServices = salesCount + receiptsCount;
+
+    res.json({
+      message: 'Real-time services count retrieved successfully',
+      date: today.toISOString().split('T')[0],
+      services_count: totalServices,
+      sales_services: salesCount,
+      receipt_services: receiptsCount
+    });
+  } catch (error) {
+    console.error('Get realtime services count error:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
