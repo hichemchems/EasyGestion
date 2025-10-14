@@ -453,41 +453,45 @@ module.exports = {
         autoIncrement: true,
         allowNull: false
       },
-      user_id: {
+      employee_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'users',
+          model: 'employees',
           key: 'id'
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
-      title: {
-        type: Sequelize.STRING(255),
+      month: {
+        type: Sequelize.INTEGER,
         allowNull: false
       },
-      description: {
-        type: Sequelize.TEXT,
-        allowNull: true
+      year: {
+        type: Sequelize.INTEGER,
+        allowNull: false
       },
-      target_amount: {
+      monthly_target: {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false
       },
-      current_amount: {
+      daily_target: {
+        type: Sequelize.DECIMAL(10, 2),
+        allowNull: false
+      },
+      current_monthly_total: {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
         defaultValue: 0
       },
-      deadline: {
-        type: Sequelize.DATE,
-        allowNull: true
+      remaining_days: {
+        type: Sequelize.INTEGER,
+        allowNull: false
       },
-      status: {
-        type: Sequelize.ENUM('active', 'completed', 'cancelled'),
+      carry_over_amount: {
+        type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
-        defaultValue: 'active'
+        defaultValue: 0
       },
       created_at: {
         type: Sequelize.DATE,
@@ -501,6 +505,12 @@ module.exports = {
       }
     });
 
+    // Add unique index for goals
+    await queryInterface.addIndex('goals', ['employee_id', 'month', 'year'], {
+      unique: true,
+      name: 'goals_employee_id_month_year'
+    });
+
     // Create alerts table
     await queryInterface.createTable('alerts', {
       id: {
@@ -509,33 +519,37 @@ module.exports = {
         autoIncrement: true,
         allowNull: false
       },
-      user_id: {
+      employee_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'users',
+          model: 'employees',
           key: 'id'
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
-      title: {
-        type: Sequelize.STRING(255),
+      type: {
+        type: Sequelize.ENUM('daily_objective', 'monthly_objective', 'goal_carryover'),
         allowNull: false
       },
       message: {
         type: Sequelize.TEXT,
         allowNull: false
       },
-      type: {
-        type: Sequelize.ENUM('info', 'warning', 'error', 'success'),
-        allowNull: false,
-        defaultValue: 'info'
+      data: {
+        type: Sequelize.JSON,
+        allowNull: true
       },
       is_read: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false
+      },
+      sent_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
       created_at: {
         type: Sequelize.DATE,
