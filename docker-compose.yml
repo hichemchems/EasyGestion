@@ -1,40 +1,19 @@
 services:
-  db:
-    image: mysql:8
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: easygestion
-      MYSQL_USER: easygestionuser
-      MYSQL_PASSWORD: easygestionpass
-    ports:
-      - "3307:3306"
-    volumes:
-      - db_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 20s
-      retries: 10
-
   backend:
     build: ./backend
     restart: always
     ports:
-      - "5002:5000"
+      - "5001:5001"
     environment:
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_USER: easygestionuser
-      DB_PASSWORD: easygestionpass
-      DB_NAME: easygestion
       JWT_SECRET: your_super_secret_jwt_key_here
-      PORT: 5000
-      FRONTEND_URL: http://localhost:3001
-    depends_on:
-      db:
-        condition: service_healthy
+      PORT: 5001
+      FRONTEND_URL: http://localhost:3000
+      DB_DIALECT: sqlite
+      DB_NAME: database.sqlite
+    volumes:
+      - ./backend/db:/app/db
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -43,12 +22,9 @@ services:
     build: ./frontend
     restart: always
     ports:
-      - "3001:3001"
+      - "3000:3000"
     environment:
-      PORT: 3001
+      PORT: 3000
     depends_on:
       backend:
         condition: service_healthy
-
-volumes:
-  db_data:

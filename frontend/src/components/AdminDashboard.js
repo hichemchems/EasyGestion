@@ -22,13 +22,14 @@ const AdminDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const [barbersRes, chartsRes, forecastRes, basketRes, clientRes, dailyRes] = await Promise.all([
+      const [barbersRes, chartsRes, forecastRes, basketRes, clientRes, dailyRes, servicesRes] = await Promise.all([
         axios.get('/api/v1/admin/dashboard/sorted-barbers'),
         axios.get('/api/v1/admin/dashboard/realtime-charts'),
         axios.get('/api/v1/admin/dashboard/forecast'),
         axios.get('/api/v1/analytics/realtime-average-basket'),
         axios.get('/api/v1/analytics/realtime-client-count'),
-        axios.get('/api/v1/analytics/realtime-daily-turnover')
+        axios.get('/api/v1/analytics/realtime-daily-turnover'),
+        axios.get('/api/v1/analytics/realtime-services-count')
       ]);
 
       setBarbers(barbersRes.data.barbers || []);
@@ -37,7 +38,8 @@ const AdminDashboard = () => {
         averageBasket: basketRes.data.average_basket,
         clientCount: clientRes.data.client_count,
         dailyTurnover: dailyRes.data.turnover,
-        forecastPercentage: forecastRes.data.percentage_achieved
+        forecastPercentage: forecastRes.data.percentage_achieved,
+        servicesCount: servicesRes.data.services_count
       });
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -112,6 +114,10 @@ const AdminDashboard = () => {
           <div style={styles.indicatorCard}>
             <div style={styles.indicatorValue}>{indicators.clientCount || 0}</div>
             <div style={styles.indicatorLabel}>Clients Aujourd'hui</div>
+          </div>
+          <div style={styles.indicatorCard}>
+            <div style={styles.indicatorValue}>{indicators.servicesCount || 0}</div>
+            <div style={styles.indicatorLabel}>Services Aujourd'hui</div>
           </div>
           <div style={styles.indicatorCard}>
             <div style={styles.indicatorValue}>€{indicators.dailyTurnover?.toFixed(2) || '0.00'}</div>

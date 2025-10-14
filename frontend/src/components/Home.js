@@ -113,9 +113,14 @@ const Home = () => {
 
       // Auto-login après enregistrement
       console.log('Attempting auto-login with email:', email);
-      await login(email, password);
-      console.log('Auto-login successful, navigating to dashboard');
-      navigate('/dashboard');
+      const loginResult = await login(email, password);
+      if (loginResult.success) {
+        console.log('Auto-login successful, navigating to dashboard');
+        navigate('/dashboard');
+      } else {
+        console.log('Auto-login failed:', loginResult.error);
+        setError('Registration successful, but auto-login failed. Please login manually.');
+      }
     } catch (error) {
       console.log('Registration error:', error);
       console.log('Error response:', error.response);

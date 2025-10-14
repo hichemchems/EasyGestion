@@ -57,13 +57,7 @@ const Goal = sequelize.define('Goal', {
   tableName: 'goals',
   timestamps: true,
   createdAt: 'created_at',
-  updatedAt: 'updated_at',
-  indexes: [
-    {
-      unique: true,
-      fields: ['employee_id', 'month', 'year']
-    }
-  ]
+  updatedAt: 'updated_at'
 });
 
 module.exports = Goal;
