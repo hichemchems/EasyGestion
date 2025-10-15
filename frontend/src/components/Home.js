@@ -100,11 +100,11 @@ const Home = () => {
     }
     console.log('FormData created:', Array.from(formData.entries()));
     console.log('Axios baseURL:', axios.defaults.baseURL);
-    console.log('Sending admin registration request to:', axios.defaults.baseURL + '/admin');
+    console.log('Sending admin registration request to:', axios.defaults.baseURL + '/api/auth/register');
 
     try {
       console.log('Making axios POST request');
-      const response = await axios.post('/api/admin', formData, {
+      const response = await axios.post('/api/auth/register', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
