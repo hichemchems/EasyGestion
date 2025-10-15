@@ -7,6 +7,10 @@ async function seedUsers() {
     await sequelize.authenticate();
     console.log('Database connected');
 
+    // Sync database models
+    await sequelize.sync();
+    console.log('Database synchronized successfully');
+
     const passwordHash = await bcrypt.hash('Admin123456789!', 12);
 
     // Delete existing
